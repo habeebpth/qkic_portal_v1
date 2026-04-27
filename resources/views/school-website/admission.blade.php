@@ -395,7 +395,7 @@
       </div>
       <div class="form-title">
         <i class="fas fa-graduation-cap me-2"></i>Qatar Kerala Islahi Center
-        <div class="subtitle">Al Manar Madrasa Admission Form 2025-2026</div>
+        <div class="subtitle">Al Manar Madrasa Admission Form 2026-2027</div>
       </div>
     </div>
 

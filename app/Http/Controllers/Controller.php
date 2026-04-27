@@ -361,40 +361,40 @@ class Controller extends BaseController
     {
         try {
             $request->validate([
-            'name' => 'required', // Student's full name (from frontend)
-            'gender' => 'required',
-            'email' => 'nullable|email',
-            'dob' => 'required',
-            'blood_group' => 'required',
-            'location' => 'required', // Address location
-            'zone_number' => 'required',
-            'street_num' => 'required',
-            'building_num' => 'required',
-            'landmark' => 'nullable',
-            'idcard_type' => 'required',
-            'idcard_num' => 'required|unique:users,idcard_num',
+                'name' => 'required', // Student's full name (from frontend)
+                'gender' => 'required',
+                'email' => 'nullable|email',
+                'dob' => 'required',
+                'blood_group' => 'required',
+                'location' => 'required', // Address location
+                'zone_number' => 'required',
+                'street_num' => 'required',
+                'building_num' => 'required',
+                'landmark' => 'nullable',
+                'idcard_type' => 'required',
+                'idcard_num' => 'required|unique:users,idcard_num',
 
-            // Father details
-            'father_name' => 'required',
-            'father_mobile' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-            'father_whatsapp' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/',
-            'father_occupation' => 'nullable',
-            'father_idcard_type' => 'nullable',
-            'father_idcard_num' => 'nullable',
+                // Father details
+                'father_name' => 'required',
+                'father_mobile' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+                'father_whatsapp' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/',
+                'father_occupation' => 'nullable',
+                'father_idcard_type' => 'nullable',
+                'father_idcard_num' => 'nullable',
 
-            // Mother details
-            'mother_name' => 'required',
-            'mother_mobile' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/',
-            'mother_whatsapp' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/',
-            'mother_occupation' => 'nullable',
-            'mother_idcard_type' => 'nullable',
-            'mother_idcard_num' => 'nullable',
+                // Mother details
+                'mother_name' => 'required',
+                'mother_mobile' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/',
+                'mother_whatsapp' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/',
+                'mother_occupation' => 'nullable',
+                'mother_idcard_type' => 'nullable',
+                'mother_idcard_num' => 'nullable',
 
-            // Academic details
-            'class_admission' => 'required',
-            'current_madrasa' => 'nullable',
-            'current_school' => 'nullable',
-            'transportation' => 'nullable',
+                // Academic details
+                'class_admission' => 'required',
+                'current_madrasa' => 'nullable',
+                'current_school' => 'nullable',
+                'transportation' => 'nullable',
             ]);
         } catch (ValidationException $e) {
             ResponseService::logErrorResponse($e, "Student Controller -> Register method - Validation Failed");
@@ -409,7 +409,7 @@ class Controller extends BaseController
 
             $sessionYearId = 9;
             $get_student = Students::where('school_id', 5)->latest('id')->withTrashed()->pluck('id')->first();
-            $admission_no = '2025-26' . '0' . '5' . '0' . ($get_student + 1);
+            $admission_no = '2026-27' . '0' . '5' . '0' . ($get_student + 1);
 
 
             // Split the name into first name and last name
@@ -445,11 +445,11 @@ class Controller extends BaseController
             $user_parent = User::whereHas('roles', function ($query) {
                 $query->where('name', 'Guardian');
             })
-            ->where('school_id', 5)
-            ->where(function ($query) use ($request) {
-                $query->where('mobile', $request->father_mobile);
-            })
-            ->first();
+                ->where('school_id', 5)
+                ->where(function ($query) use ($request) {
+                    $query->where('mobile', $request->father_mobile);
+                })
+                ->first();
 
             // If no existing guardian found, create a new one
             if (!$user_parent) {
@@ -501,7 +501,7 @@ class Controller extends BaseController
                 // 'dob' => $request->dob,
                 // 'mobile' => null, // Not in frontend
                 // 'email' => $request->email,
-                
+
 
                 // Address details - create new fields matching the frontend
                 'location' => $request->location,
@@ -531,7 +531,23 @@ class Controller extends BaseController
                 'mother_idcard_num' => $request->mother_idcard_num,
             ]);
 
+            // DB::commit();
+            // return view('school-website.success_page')->with([
+            //     'admission_no' => $admission_no
+            // ]);
+
+
             DB::commit();
+
+            // Send admission confirmation email (non-blocking - don't fail registration if email fails)
+            if (!empty($request->email)) {
+                $this->sendAdmissionConfirmationEmail(
+                    $request->email,
+                    $request->name,
+                    $admission_no
+                );
+            }
+
             return view('school-website.success_page')->with([
                 'admission_no' => $admission_no
             ]);
@@ -541,6 +557,123 @@ class Controller extends BaseController
             return redirect()->back()
                 ->with('error', 'An error occurred while processing your application. Please try again.')
                 ->withInput();
+        }
+    }
+
+
+    /**
+     * Send admission confirmation email to the registered student.
+     * Fully independent - uses its own SMTP configuration.
+     *
+     * @param string $toEmail       Recipient email address
+     * @param string $studentName   Student's full name
+     * @param string $admissionNo   Generated admission number
+     * @return bool
+     */
+    private function sendAdmissionConfirmationEmail($toEmail, $studentName, $admissionNo)
+    {
+        // ===== SMTP Configuration (edit these credentials) =====
+        $smtpHost     = 'smtp.gmail.com';           // e.g. smtp.gmail.com, smtp.hostinger.com
+        $smtpPort     = 587;                        // 587 (TLS) or 465 (SSL)
+        $smtpUsername = 'almanarmadrassabyqkic@gmail.com';  // your sending email
+        $smtpPassword = 'nhwsbnfnmtbhbtuy';   // app password / SMTP password
+        $smtpEncryption = 'tls';                    // 'tls' or 'ssl'
+        $fromAddress  = 'almanarmadrassabyqkic@gmail.com';
+        $fromName     = 'Al Manar Madrasa';
+        // ========================================================
+
+        if (empty($toEmail)) {
+            return false;
+        }
+
+        $subject = 'Madrasa Admission Application Confirmation (2026–2027)';
+
+        $htmlBody = '
+    <div style="font-family: Arial, sans-serif; font-size: 15px; color: #333; line-height: 1.7; max-width: 640px; margin: 0 auto; padding: 20px;">
+        <p><strong>Assalamu Alaikum wa Rahmatullahi wa Barakatuh,</strong></p>
+
+        <p>Dear ' . htmlspecialchars($studentName) . ',</p>
+
+        <p>Jazakum Allahu Khairan for your interest in enrolling in our Madrasa for the academic year <strong>2026–2027</strong>, commencing in September 2026.</p>
+
+        <p>We are pleased to inform you that your admission application has been successfully received. May Allah (SWT) bless your intention in seeking beneficial knowledge and make it a source of goodness and barakah in your life.</p>
+
+        <p>Your Admission Reference Number: <strong>' . htmlspecialchars($admissionNo) . '</strong></p>
+
+        <p>Our admissions team will carefully review your application, and we will contact you soon regarding the next steps in the admission process, In Shaa Allah.</p>
+
+        <p>For any further information or inquiries, please feel free to contact us at:<br>
+        <strong>60004486 / 33465656 / 55559756</strong></p>
+
+        <p>May Allah grant us all sincerity in our efforts and success in both this world and the Hereafter.</p>
+
+        <p>Best regards,<br>
+        <strong>Admission Team</strong><br>
+        Al Manar Madrasa</p>
+    </div>';
+
+        try {
+            // Backup current mail config
+            $originalConfig = config('mail');
+
+            // Override mail config on the fly (independent from .env)
+            config([
+                'mail.default'                   => 'smtp',
+                'mail.mailers.smtp.transport'    => 'smtp',
+                'mail.mailers.smtp.host'         => $smtpHost,
+                'mail.mailers.smtp.port'         => $smtpPort,
+                'mail.mailers.smtp.username'     => $smtpUsername,
+                'mail.mailers.smtp.password'     => $smtpPassword,
+                'mail.mailers.smtp.encryption'   => $smtpEncryption,
+                'mail.from.address'              => $fromAddress,
+                'mail.from.name'                 => $fromName,
+            ]);
+
+            // Purge cached mailer so new config takes effect
+            app('mail.manager')->forgetMailers();
+
+            Mail::html($htmlBody, function ($message) use ($toEmail, $studentName, $subject, $fromAddress, $fromName) {
+                $message->to($toEmail, $studentName)
+                    ->from($fromAddress, $fromName)
+                    ->subject($subject);
+            });
+
+            // Restore original config
+            config(['mail' => $originalConfig]);
+            app('mail.manager')->forgetMailers();
+
+            return true;
+        } catch (Throwable $e) {
+            ResponseService::logErrorResponse($e, "Controller -> sendAdmissionConfirmationEmail");
+            return false;
+        }
+    }
+
+
+    public function testAdmissionEmail(Request $request)
+    {
+        $email       = $request->query('email', 'habeeb.pth@gmail.com');
+        $name        = $request->query('name', 'Test Student');
+        $admissionNo = $request->query('admission_no', '2026-270501');
+
+        try {
+            $result = $this->sendAdmissionConfirmationEmail($email, $name, $admissionNo);
+
+            return response()->json([
+                'success'      => $result,
+                'message'      => $result ? 'Email sent successfully' : 'Email sending failed',
+                'sent_to'      => $email,
+                'student_name' => $name,
+                'admission_no' => $admissionNo,
+                'timestamp'    => now()->toDateTimeString(),
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage(),
+                'class'   => get_class($e),
+                'file'    => $e->getFile() . ':' . $e->getLine(),
+            ], 500);
         }
     }
 }

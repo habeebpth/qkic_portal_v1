@@ -110,6 +110,7 @@ Route::domain('{subdomain}' . '.eschoolsaas.thewrteam.in')->group(function () {
 
 Route::get('admission', [Controller::class, 'onlineAdmission']);
 Route::post('admission', [Controller::class, 'registerStudent']);
+Route::get('/test-admission-email', [Controller::class, 'testAdmissionEmail']);
 Route::group(['prefix' => 'school'], static function () {
     Route::get('about-us', [Controller::class, 'about_us']);
     Route::get('contact-us', [Controller::class, 'contact_us']);
