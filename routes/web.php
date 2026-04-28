@@ -269,6 +269,7 @@ Route::group(['middleware' => ['Role', 'auth', 'checkSchoolStatus', 'status']], 
 
         });
         Route::resource('students', StudentController::class);
+Route::get('students-export', [App\Http\Controllers\StudentController::class, 'exportAllData'])->name('students.export-all');
 
         Route::get('id-card-settings', [SchoolSettingsController::class, 'id_card_index'])->name('id-card-settings');
         Route::post('id-card-settings', [SchoolSettingsController::class, 'id_card_store']);

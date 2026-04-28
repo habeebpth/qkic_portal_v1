@@ -40,6 +40,7 @@
                             @can('student-delete')
                                 <div class="form-group col-12">
                                     <button id="update-status" class="btn btn-secondary" disabled><span class="update-status-btn-name">{{ __('Inactive') }}</span></button>
+                                    <button class="btn btn-success ml-2" id="export-all-students"><i class="fa fa-file-excel-o"></i> Export All</button>
                                 </div>
                             @endcan
                         </div>
@@ -58,7 +59,7 @@
                                        data-toolbar="#toolbar" data-show-columns="true" data-show-refresh="true" data-fixed-columns="false"
                                        data-trim-on-search="false" data-mobile-responsive="true" data-sort-name="id"
                                        data-sort-order="desc" data-maintain-selected="true" data-export-types="['pdf','json', 'xml', 'csv', 'txt', 'sql', 'doc', 'excel']" data-show-export="true"
-                                       data-export-options='{ "fileName": "students-list-<?= date('d-m-y') ?>" ,"ignoreColumn": ["operate"]}' data-query-params="studentDetailsQueryParams"
+                                       data-export-options='{ "fileName": "students-list-<?= date('d-m-y') ?>" ,"ignoreColumn": ["operate"], "exportHiddenColumns": true}' data-query-params="studentDetailsQueryParams"
                                        data-check-on-init="true" data-escape="true">
                                     <thead>
                                     <tr>
@@ -82,10 +83,34 @@
                                         <th scope="col" data-field="mother_mobile">{{ __('mother_mobile') }}</th>
                                         <th scope="col" data-field="mother_whatsapp">{{ __('mother_whatsapp') }}</th>
                                         <th scope="col" data-field="mother_occupation">{{ __('mother_occupation') }}</th>
-                                        {{-- <th scope="col" data-field="guardian.email">{{ __('guardian') . ' ' . __('email') }}</th>
-                                        <th scope="col" data-field="guardian.full_name">{{ __('guardian') . ' ' . __('name') }}</th>
-                                        <th scope="col" data-field="guardian.mobile">{{ __('guardian') . ' ' . __('mobile') }}</th>
-                                        <th scope="col" data-field="guardian.gender">{{ __('guardian') . ' ' . __('gender') }}</th> --}}
+                                        <th scope="col" data-field="user.email" data-visible="true">{{ __('email') }}</th>
+                                        <th scope="col" data-field="user.mobile" data-visible="true">{{ __('mobile') }}</th>
+                                        <th scope="col" data-field="user.blood_group" data-visible="false">{{ __('blood_group') }}</th>
+                                        <th scope="col" data-field="user.idcard_type" data-visible="false">{{ __('student_id_card_type') }}</th>
+                                        <th scope="col" data-field="user.idcard_num" data-visible="false">{{ __('student_id_card_num') }}</th>
+
+                                        <th scope="col" data-field="user.current_address" data-visible="false">{{ __('current_address') }}</th>
+                                        <th scope="col" data-field="user.permanent_address" data-visible="false">{{ __('permanent_address') }}</th>
+
+                                        <th scope="col" data-field="location" data-visible="true">{{ __('location') }}</th>
+                                        <th scope="col" data-field="zone_number" data-visible="false">{{ __('zone_number') }}</th>
+                                        <th scope="col" data-field="street_num" data-visible="false">{{ __('street_num') }}</th>
+                                        <th scope="col" data-field="building_num" data-visible="false">{{ __('building_num') }}</th>
+                                        <th scope="col" data-field="landmark" data-visible="false">{{ __('landmark') }}</th>
+
+                                        <th scope="col" data-field="current_madrasa" data-visible="false">{{ __('current_madrasa') }}</th>
+                                        <th scope="col" data-field="current_school" data-visible="false">{{ __('current_school') }}</th>
+                                        <th scope="col" data-field="transportation" data-visible="false">{{ __('transportation') }}</th>
+
+                                        <th scope="col" data-field="father_idcard_type" data-visible="false">{{ __('father_idcard_type') }}</th>
+                                        <th scope="col" data-field="father_idcard_num" data-visible="false">{{ __('father_idcard_num') }}</th>
+                                        <th scope="col" data-field="mother_idcard_type" data-visible="false">{{ __('mother_idcard_type') }}</th>
+                                        <th scope="col" data-field="mother_idcard_num" data-visible="false">{{ __('mother_idcard_num') }}</th>
+
+                                        <th scope="col" data-field="guardian.full_name" data-visible="true">{{ __('guardian_name') }}</th>
+                                        <th scope="col" data-field="guardian.mobile" data-visible="true">{{ __('guardian_mobile') }}</th>
+                                        <th scope="col" data-field="guardian.email" data-visible="false">{{ __('guardian_email') }}</th>
+                                        <th scope="col" data-field="guardian.gender" data-visible="false">{{ __('guardian_gender') }}</th>
 
                                         {{-- Admission form fields --}}
                                         @foreach ($extraFields as $field)
@@ -94,7 +119,7 @@
                                         {{-- End admission form fields --}}
 
                                         @canany(['student-edit','student-delete'])
-                                            <th data-events="studentEvents" class="align-button text-center" scope="col" data-field="operate" data-escape="false">{{ __('action') }}</th>
+                                            <th data-events="studentEvents" class="align-button text-center operate-col" scope="col" data-formatter="actionColumnFormatter" data-width="250" data-field="operate" data-escape="false">{{ __('action') }}</th>
                                         @endcanany
                                     </tr>
                                     </thead>
@@ -166,6 +191,15 @@
                                     <span class="input-group-addon input-group-append">
                                     </span>
                                 </div>
+                                <input type="hidden" name="idcard_type" id="edit_idcard_type" value="QID">
+                                <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                    <label>{{ __('Qatar ID Number') }} <span class="text-danger">*</span></label>
+                                    {!! Form::text('idcard_num', null, ['placeholder' => __('Qatar ID Number'), 'class' => 'form-control', 'id' => 'edit_idcard_num']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                    <label>{{ __('Blood Group') }}</label>
+                                    {!! Form::text('blood_group', null, ['placeholder' => __('Blood Group'), 'class' => 'form-control', 'id' => 'edit_blood_group']) !!}
+                                </div>
 
                                 <div class="form-group col-sm-12 col-md-4">
                                     <label>{{ __('gender') }} <span class="text-danger">*</span></label><br>
@@ -208,6 +242,49 @@
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>{{ __('permanent_address') }} <span class="text-danger">*</span></label>
                                     {!! Form::textarea('permanent_address', null, ['required', 'placeholder' => __('permanent_address'), 'class' => 'form-control', 'rows' => 3,'id'=>'edit-permanent-address']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Location') }} <span class="text-danger">*</span></label>
+                                    {!! Form::text('location', null, ['placeholder' => __('Location'), 'class' => 'form-control', 'id' => 'edit_location']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Zone Number') }} <span class="text-danger">*</span></label>
+                                    {!! Form::text('zone_number', null, ['placeholder' => __('Zone Number'), 'class' => 'form-control', 'id' => 'edit_zone_number']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Street Number') }} <span class="text-danger">*</span></label>
+                                    {!! Form::text('street_num', null, ['placeholder' => __('Street Number'), 'class' => 'form-control', 'id' => 'edit_street_num']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Building Number') }} <span class="text-danger">*</span></label>
+                                    {!! Form::text('building_num', null, ['placeholder' => __('Building Number'), 'class' => 'form-control', 'id' => 'edit_building_num']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Landmark') }}</label>
+                                    {!! Form::text('landmark', null, ['placeholder' => __('Landmark'), 'class' => 'form-control', 'id' => 'edit_landmark']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Current Madrasa') }}</label>
+                                    {!! Form::text('current_madrasa', null, ['placeholder' => __('Current Madrasa'), 'class' => 'form-control', 'id' => 'edit_current_madrasa']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Current School') }}</label>
+                                    {!! Form::text('current_school', null, ['placeholder' => __('Current School'), 'class' => 'form-control', 'id' => 'edit_current_school']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Transportation Required') }}</label><br>
+                                    <div class="d-flex">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label">
+                                                {!! Form::radio('transportation', 'yes', false ,['id' => 'edit_transportation_yes']) !!} Yes
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label">
+                                                {!! Form::radio('transportation', 'no', false , ['id' => 'edit_transportation_no']) !!} No
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -323,6 +400,60 @@
                             
 
                             <hr>
+                            {{-- Father Details --}}
+                            <h5 class="mb-3">Father's Details</h5>
+                            <div class="row">
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Father's Name <span class="text-danger">*</span></label>
+                                    {!! Form::text('father_name', null, ['placeholder' => __('Father Name'), 'class' => 'form-control', 'id' => 'edit_father_name']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Mobile Number <span class="text-danger">*</span></label>
+                                    {!! Form::number('father_mobile', null, ['placeholder' => __('Mobile'), 'min' => 1 , 'class' => 'form-control remove-number-increment', 'id' => 'edit_father_mobile']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>WhatsApp Number</label>
+                                    {!! Form::number('father_whatsapp', null, ['placeholder' => __('WhatsApp Number'), 'min' => 1 , 'class' => 'form-control remove-number-increment', 'id' => 'edit_father_whatsapp']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Occupation</label>
+                                    {!! Form::text('father_occupation', null, ['placeholder' => __('Occupation'), 'class' => 'form-control', 'id' => 'edit_father_occupation']) !!}
+                                </div>
+                                <input type="hidden" name="father_idcard_type" id="edit_father_idcard_type" value="QID">
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Qatar ID Number</label>
+                                    {!! Form::text('father_idcard_num', null, ['placeholder' => __('Qatar ID Number'), 'class' => 'form-control', 'id' => 'edit_father_idcard_num']) !!}
+                                </div>
+                            </div>
+
+                            <hr>
+                            {{-- Mother Details --}}
+                            <h5 class="mb-3">Mother's Details</h5>
+                            <div class="row">
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Mother's Name <span class="text-danger">*</span></label>
+                                    {!! Form::text('mother_name', null, ['placeholder' => __('Mother Name'), 'class' => 'form-control', 'id' => 'edit_mother_name']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Mobile Number</label>
+                                    {!! Form::number('mother_mobile', null, ['placeholder' => __('Mobile'), 'min' => 1 , 'class' => 'form-control remove-number-increment', 'id' => 'edit_mother_mobile']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>WhatsApp Number</label>
+                                    {!! Form::number('mother_whatsapp', null, ['placeholder' => __('WhatsApp Number'), 'min' => 1 , 'class' => 'form-control remove-number-increment', 'id' => 'edit_mother_whatsapp']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Occupation</label>
+                                    {!! Form::text('mother_occupation', null, ['placeholder' => __('Occupation'), 'class' => 'form-control', 'id' => 'edit_mother_occupation']) !!}
+                                </div>
+                                <input type="hidden" name="mother_idcard_type" id="edit_mother_idcard_type" value="QID">
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Qatar ID Number</label>
+                                    {!! Form::text('mother_idcard_num', null, ['placeholder' => __('Qatar ID Number'), 'class' => 'form-control', 'id' => 'edit_mother_idcard_num']) !!}
+                                </div>
+                            </div>
+
+                            <hr>
                             {{-- Guardian Details --}}
                             <div class="row mt-5">
                                 <div class="form-group col-sm-12 col-md-12">
@@ -383,6 +514,213 @@
                             <input class="btn btn-theme" type="submit" value={{ __('submit') }}>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    @endcan
+
+    @can('student-edit')
+        <div class="modal fade" id="viewModal" data-backdrop="static" tabindex="-1" role="dialog"
+             aria-labelledby="viewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="viewModalLabel">{{ __('view') . ' ' . __('students') }}</h4><br>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"><i class="fa fa-close"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('admission_no') }}</label>
+                                <input type="text" id="view_admission_no" class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('Session Year') }}</label>
+                                <input type="text" id="view_session_year" class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('Class Section') }}</label>
+                                <input type="text" id="view_class_section" class="form-control" readonly>
+                            </div>
+
+                        </div>
+                        <hr>
+                        <div class="row mt-5">
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('first_name') }}</label>
+                                <input type="text" id="view_first_name" class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('last_name') }}</label>
+                                <input type="text" id="view_last_name" class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('dob') }}</label>
+                                <input type="text" id="view_dob" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('Qatar ID Number') }}</label>
+                                <input type="text" id="view_idcard_num" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('Blood Group') }}</label>
+                                <input type="text" id="view_blood_group" class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>{{ __('gender') }}</label>
+                                <input type="text" id="view_gender" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('image') }}</label>
+                                <div style="width: 100px;">
+                                    <img src="" id="view-student-image-tag" class="img-fluid w-100" alt=""/>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('mobile') }}</label>
+                                <input type="text" id="view_mobile" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <label>{{ __('current_address') }}</label>
+                                <textarea id="view-current-address" class="form-control" rows="3" readonly></textarea>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <label>{{ __('permanent_address') }}</label>
+                                <textarea id="view-permanent-address" class="form-control" rows="3" readonly></textarea>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>{{ __('Location') }}</label>
+                                <input type="text" id="view_location" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>{{ __('Zone Number') }}</label>
+                                <input type="text" id="view_zone_number" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>{{ __('Street Number') }}</label>
+                                <input type="text" id="view_street_num" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>{{ __('Building Number') }}</label>
+                                <input type="text" id="view_building_num" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>{{ __('Landmark') }}</label>
+                                <input type="text" id="view_landmark" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>{{ __('Current Madrasa') }}</label>
+                                <input type="text" id="view_current_madrasa" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>{{ __('Current School') }}</label>
+                                <input type="text" id="view_current_school" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>{{ __('Transportation Required') }}</label>
+                                <input type="text" id="view_transportation" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <div id="view-extra-fields" class="row">
+                            <!-- Dynamic extra fields will be appended here -->
+                        </div>
+
+                        <hr>
+                        {{-- Father Details --}}
+                        <h5 class="mb-3">Father's Details</h5>
+                        <div class="row">
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>Father's Name</label>
+                                <input type="text" id="view_father_name" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>Mobile Number</label>
+                                <input type="text" id="view_father_mobile" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>WhatsApp Number</label>
+                                <input type="text" id="view_father_whatsapp" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>Occupation</label>
+                                <input type="text" id="view_father_occupation" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>Qatar ID Number</label>
+                                <input type="text" id="view_father_idcard_num" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <hr>
+                        {{-- Mother Details --}}
+                        <h5 class="mb-3">Mother's Details</h5>
+                        <div class="row">
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>Mother's Name</label>
+                                <input type="text" id="view_mother_name" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>Mobile Number</label>
+                                <input type="text" id="view_mother_mobile" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>WhatsApp Number</label>
+                                <input type="text" id="view_mother_whatsapp" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>Occupation</label>
+                                <input type="text" id="view_mother_occupation" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-4">
+                                <label>Qatar ID Number</label>
+                                <input type="text" id="view_mother_idcard_num" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <hr>
+                        {{-- Guardian Details --}}
+                        <div class="row mt-5">
+                            <div class="form-group col-sm-12 col-md-12">
+                                <label>{{ __('guardian') . ' ' . __('email') }}</label>
+                                <input type="text" id="view_guardian_email" class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('guardian') . ' ' . __('first_name') }}</label>
+                                <input type="text" id="view_guardian_first_name" class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('guardian') . ' ' . __('last_name') }}</label>
+                                <input type="text" id="view_guardian_last_name" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('guardian') . ' ' . __('mobile') }}</label>
+                                <input type="text" id="view_guardian_mobile" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-12">
+                                <label>{{ __('gender') }}</label>
+                                <input type="text" id="view_guardian_gender" class="form-control" readonly>
+                            </div>
+                            <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                <label>{{ __('image') }}</label>
+                                <div style="width: 100px;">
+                                    <img src="" id="view-guardian-image-tag" class="img-fluid w-100" alt=""/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('Close') }}</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -465,5 +803,20 @@
                 }
             })
         })
+
+        $('#export-all-students').on('click', function(e) {
+            e.preventDefault();
+            let tableListType = $('.table-list-type.active').data('id');
+            let classId = $('#filter_class_section_id').val();
+            let sessionYearId = $('#filter_session_year_id').val();
+            let search = $('.search input').val();
+            
+            let exportUrl = '{{ route("students.export-all") }}' + 
+                            '?show_deactive=' + (tableListType !== undefined ? tableListType : 0) + 
+                            (classId ? '&class_id=' + classId : '') + 
+                            (sessionYearId ? '&session_year_id=' + sessionYearId : '') +
+                            (search ? '&search=' + encodeURIComponent(search) : '');
+            window.location.href = exportUrl;
+        });
     </script>
 @endsection

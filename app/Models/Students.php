@@ -94,6 +94,11 @@ class Students extends Model
         return $this->belongsTo(ClassSection::class)->withTrashed();
     }
 
+    public function session_year()
+    {
+        return $this->belongsTo(SessionYear::class)->withTrashed();
+    }
+
     public function subjects()
     {
         $studentSubject = app(StudentSubjectInterface::class);

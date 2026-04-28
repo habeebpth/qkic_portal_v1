@@ -184,6 +184,43 @@ class StudentController extends Controller {
             $sessionYear = $this->sessionYear->findById($request->session_year_id);
             $guardian = $userService->createOrUpdateParent($request->guardian_first_name, $request->guardian_last_name, $request->guardian_email, $request->guardian_mobile, $request->guardian_gender, $request->guardian_image);
             $userService->updateStudentUser($id, $request->first_name, $request->last_name, $request->mobile, $request->dob, $request->gender, $request->image, $sessionYear->id, $request->extra_fields ?? [], $guardian->id, $request->current_address, $request->permanent_address, $request->reset_password, $request->class_section_id);
+            
+            // Also update the extra admission fields
+            $studentUser = \App\Models\User::withTrashed()->find($id);
+            if ($studentUser) {
+                $studentUser->update([
+                    'blood_group' => $request->blood_group,
+                    'idcard_type' => $request->idcard_type,
+                    'idcard_num'  => $request->idcard_num,
+                ]);
+            }
+            
+            $studentRecord = \App\Models\Students::withTrashed()->where('user_id', $id)->first();
+            if ($studentRecord) {
+                $studentRecord->update([
+                    'location'           => $request->location,
+                    'zone_number'        => $request->zone_number,
+                    'street_num'         => $request->street_num,
+                    'building_num'       => $request->building_num,
+                    'landmark'           => $request->landmark,
+                    'current_madrasa'    => $request->current_madrasa,
+                    'current_school'     => $request->current_school,
+                    'transportation'     => $request->transportation,
+                    'father_name'        => $request->father_name,
+                    'father_mobile'      => $request->father_mobile,
+                    'father_whatsapp'    => $request->father_whatsapp,
+                    'father_occupation'  => $request->father_occupation,
+                    'father_idcard_type' => $request->father_idcard_type,
+                    'father_idcard_num'  => $request->father_idcard_num,
+                    'mother_name'        => $request->mother_name,
+                    'mother_mobile'      => $request->mother_mobile,
+                    'mother_whatsapp'    => $request->mother_whatsapp,
+                    'mother_occupation'  => $request->mother_occupation,
+                    'mother_idcard_type' => $request->mother_idcard_type,
+                    'mother_idcard_num'  => $request->mother_idcard_num,
+                ]);
+            }
+
             DB::commit();
             ResponseService::successResponse('Data Updated Successfully');
         } catch (Throwable $e) {
@@ -201,7 +238,7 @@ class StudentController extends Controller {
         $order = request('order', 'ASC');
         $search = request('search');
 
-        $sql = $this->student->builder()->with('user.extra_student_details.form_field', 'guardian', 'class_section.class.stream', 'class_section.section', 'class_section.medium')
+        $sql = $this->student->builder()->with('user.extra_student_details.form_field', 'guardian', 'class_section.class.stream', 'class_section.section', 'class_section.medium', 'session_year')
             ->where(function ($query) use ($search) {
                 $query->when($search, function ($query) use ($search) {
                     $query->where(function ($query) use ($search) {
@@ -268,18 +305,27 @@ class StudentController extends Controller {
         $no = 1;
         foreach ($res as $row) {
             $operate = '';
+            // Always show view button
+            $operate .= BootstrapTableService::button('fa fa-eye', '#', ['btn-gradient-info', 'view-student'], ['title' => __('view'), 'data-id' => $row->id]);
+            
+            if (Auth::user()->can('student-edit')) {
+                $operate .= BootstrapTableService::editButton(route('students.update', $row->user->id, ['data-id' => $row->id]));
+            }
+
             if (!$request->show_deactive) {
                 if (Auth::user()->can('student-edit')) {
-                    $operate .= BootstrapTableService::editButton(route('students.update', $row->user->id, ['data-id' => $row->id]));
                     $operate .= BootstrapTableService::button('fa fa-exclamation-triangle', route('student.change-status', $row->user_id), ['btn-gradient-info', 'deactivate-student'], ['title' => __('inactive')]);
                 }
             } else {
-                $operate .= BootstrapTableService::button('fa fa-check', route('student.change-status', $row->user_id), ['btn-gradient-success', 'activate-student'], ['title' => __('active')]);
+                if (Auth::user()->can('student-edit')) {
+                    $operate .= BootstrapTableService::button('fa fa-check', route('student.change-status', $row->user_id), ['btn-gradient-success', 'activate-student'], ['title' => __('active')]);
+                }
             }
 
             if (Auth::user()->can('student-delete')) {
                 $operate .= BootstrapTableService::trashButton(route('student.trash', $row->user_id));
             }
+            $operate .= '<span style="display:inline-block; width: 20px;"></span>';
             $tempRow = $row->toArray();
             $tempRow['no'] = $no++;
             // $tempRow['user.dob'] = format_date($row->user->dob);
@@ -612,6 +658,24 @@ class StudentController extends Controller {
         } catch (Throwable $e) {
             ResponseService::logErrorResponse($e, 'Student Controller ---> Download Sample File');
             ResponseService::errorResponse();
+        }
+    }
+
+    public function exportAllData(Request $request)
+    {
+        try {
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\AllStudentDataExport(
+                    $request->show_deactive,
+                    $request->class_id,
+                    $request->session_year_id,
+                    $request->search
+                ), 
+                'all-students-data-' . date('d-m-Y') . '.xlsx'
+            );
+        } catch (Throwable $e) {
+            ResponseService::logErrorResponse($e, 'Student Controller ---> Export All Data');
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 

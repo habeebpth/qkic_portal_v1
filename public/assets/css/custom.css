@@ -250,17 +250,8 @@ label.filter-menu {
     left: -2rem !important;
 }
 .action-column-menu {
-
-    /* position: absolute; */
-    /* transform: translate(-50%, -50%); */
-
-    /* position: absolute;
-    transform: translate(-50%, -50%);
     white-space: nowrap;
-    z-index: 1000; */
-
-    /* top: 50%;
-    left: 50%; */
+    text-align: center;
 }
 
 .action-td-cell {
