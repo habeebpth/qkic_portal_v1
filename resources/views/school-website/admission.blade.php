@@ -438,7 +438,7 @@
               <label for="name" class="form-label">Name (As per QID/Passport)</label>
               <div class="input-with-icon">
                 <i class="fas fa-user-circle"></i>
-                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
+                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" required>
               </div>
               @error('name')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -559,14 +559,12 @@
                 <div class="invalid-feedback d-block">{{ $message }}</div>
               @enderror
             </div>
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-6 d-none">
               <label for="idcard_type" class="form-label">ID Card Type</label>
               <div class="input-with-icon">
                 <i class="fas fa-id-card"></i>
                 <select class="form-select @error('idcard_type') is-invalid @enderror" name="idcard_type" id="idcard_type" required>
-                  <option value="">Select ID Card Type</option>
-                  <option value="QID" {{ old('idcard_type') == 'QID' ? 'selected' : '' }}>QID</option>
-                  <option value="Passport" {{ old('idcard_type') == 'Passport' ? 'selected' : '' }}>Passport</option>
+                  <option value="QID" selected>QID</option>
                 </select>
               </div>
               @error('idcard_type')
@@ -575,7 +573,7 @@
             </div>
 
             <div class="col-lg-4 col-md-6">
-              <label for="idcard_num" class="form-label">ID Card Number</label>
+              <label for="idcard_num" class="form-label">Qatar ID Number</label>
               <div class="input-with-icon">
                 <i class="fas fa-hashtag"></i>
                 <input type="text" class="form-control @error('idcard_num') is-invalid @enderror" id="idcard_num" name="idcard_num" value="{{ old('idcard_num') }}" required>
@@ -604,7 +602,7 @@
               <label for="father_name" class="form-label">Father Name (As per QID/Passport)</label>
               <div class="input-with-icon">
                 <i class="fas fa-user"></i>
-                <input type="text" class="form-control @error('father_name') is-invalid @enderror" id="father_name" name="father_name" value="{{ old('father_name') }}" required>
+                <input type="text" class="form-control @error('father_name') is-invalid @enderror" id="father_name" name="father_name" value="{{ old('father_name') }}" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" required>
               </div>
               @error('father_name')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -615,7 +613,7 @@
               <label for="father_mobile" class="form-label">Father Mobile</label>
               <div class="input-with-icon">
                 <i class="fas fa-mobile-alt"></i>
-                <input type="tel" class="form-control @error('father_mobile') is-invalid @enderror" id="father_mobile" name="father_mobile" value="{{ old('father_mobile') }}" required>
+                <input type="tel" class="form-control @error('father_mobile') is-invalid @enderror" id="father_mobile" name="father_mobile" value="{{ old('father_mobile') }}" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" required>
               </div>
               @error('father_mobile')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -626,7 +624,7 @@
               <label for="father_whatsapp" class="form-label">Father Whatsapp Number</label>
               <div class="input-with-icon">
                 <i class="fab fa-whatsapp"></i>
-                <input type="tel" class="form-control @error('father_whatsapp') is-invalid @enderror" id="father_whatsapp" name="father_whatsapp" value="{{ old('father_whatsapp') }}">
+                <input type="tel" class="form-control @error('father_whatsapp') is-invalid @enderror" id="father_whatsapp" name="father_whatsapp" value="{{ old('father_whatsapp') }}" oninput="this.value = this.value.replace(/[^0-9+]/g, '')">
               </div>
               @error('father_whatsapp')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -644,14 +642,12 @@
               @enderror
             </div>
 
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-6 d-none">
               <label for="father_idcard_type" class="form-label">Father ID Card Type</label>
               <div class="input-with-icon">
                 <i class="fas fa-id-card"></i>
                 <select class="form-select @error('father_idcard_type') is-invalid @enderror" name="father_idcard_type" id="father_idcard_type">
-                  <option value="">Select ID Card Type</option>
-                  <option value="QID" {{ old('father_idcard_type') == 'QID' ? 'selected' : '' }}>QID</option>
-                  <option value="Passport" {{ old('father_idcard_type') == 'Passport' ? 'selected' : '' }}>Passport</option>
+                  <option value="QID" selected>QID</option>
                 </select>
               </div>
               @error('father_idcard_type')
@@ -660,7 +656,7 @@
             </div>
 
             <div class="col-lg-4 col-md-6">
-              <label for="father_idcard_num" class="form-label">Father ID Card Number</label>
+              <label for="father_idcard_num" class="form-label">Father Qatar ID Number</label>
               <div class="input-with-icon">
                 <i class="fas fa-hashtag"></i>
                 <input type="text" class="form-control @error('father_idcard_num') is-invalid @enderror" id="father_idcard_num" name="father_idcard_num" value="{{ old('father_idcard_num') }}">
@@ -679,7 +675,7 @@
               <label for="mother_name" class="form-label">Mother Name (As per QID/Passport)</label>
               <div class="input-with-icon">
                 <i class="fas fa-user"></i>
-                <input type="text" class="form-control @error('mother_name') is-invalid @enderror" id="mother_name" name="mother_name" value="{{ old('mother_name') }}" required>
+                <input type="text" class="form-control @error('mother_name') is-invalid @enderror" id="mother_name" name="mother_name" value="{{ old('mother_name') }}" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" required>
               </div>
               @error('mother_name')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -690,7 +686,7 @@
               <label for="mother_mobile" class="form-label">Mother Mobile</label>
               <div class="input-with-icon">
                 <i class="fas fa-mobile-alt"></i>
-                <input type="tel" class="form-control @error('mother_mobile') is-invalid @enderror" id="mother_mobile" name="mother_mobile" value="{{ old('mother_mobile') }}" required>
+                <input type="tel" class="form-control @error('mother_mobile') is-invalid @enderror" id="mother_mobile" name="mother_mobile" value="{{ old('mother_mobile') }}" oninput="this.value = this.value.replace(/[^0-9+]/g, '')" required>
               </div>
               @error('mother_mobile')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -701,7 +697,7 @@
               <label for="mother_whatsapp" class="form-label">Mother Whatsapp Number</label>
               <div class="input-with-icon">
                 <i class="fab fa-whatsapp"></i>
-                <input type="tel" class="form-control @error('mother_whatsapp') is-invalid @enderror" id="mother_whatsapp" name="mother_whatsapp" value="{{ old('mother_whatsapp') }}">
+                <input type="tel" class="form-control @error('mother_whatsapp') is-invalid @enderror" id="mother_whatsapp" name="mother_whatsapp" value="{{ old('mother_whatsapp') }}" oninput="this.value = this.value.replace(/[^0-9+]/g, '')">
               </div>
               @error('mother_whatsapp')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -719,14 +715,12 @@
               @enderror
             </div>
 
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-6 d-none">
               <label for="mother_idcard_type" class="form-label">Mother ID Card Type</label>
               <div class="input-with-icon">
                 <i class="fas fa-id-card"></i>
                 <select class="form-select @error('mother_idcard_type') is-invalid @enderror" name="mother_idcard_type" id="mother_idcard_type">
-                  <option value="">Select ID Card Type</option>
-                  <option value="QID" {{ old('mother_idcard_type') == 'QID' ? 'selected' : '' }}>QID</option>
-                  <option value="Passport" {{ old('mother_idcard_type') == 'Passport' ? 'selected' : '' }}>Passport</option>
+                  <option value="QID" selected>QID</option>
                 </select>
               </div>
               @error('mother_idcard_type')
@@ -735,7 +729,7 @@
             </div>
 
             <div class="col-lg-4 col-md-6">
-              <label for="mother_idcard_num" class="form-label">Mother ID Card Number</label>
+              <label for="mother_idcard_num" class="form-label">Mother Qatar ID Number</label>
               <div class="input-with-icon">
                 <i class="fas fa-hashtag"></i>
                 <input type="text" class="form-control @error('mother_idcard_num') is-invalid @enderror" id="mother_idcard_num" name="mother_idcard_num" value="{{ old('mother_idcard_num') }}">

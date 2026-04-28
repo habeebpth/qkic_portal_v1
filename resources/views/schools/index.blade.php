@@ -143,16 +143,16 @@
                             <tr>
                                 <th scope="col" data-field="id" data-sortable="true" data-visible="false">{{ __('id') }}</th>
                                 <th scope="col" data-field="no">{{ __('no.') }}</th>
-                                <th scope="col" data-field="logo" data-formatter="imageFormatter">{{ __('logo') }}</th>
+                                <th scope="col" data-field="logo" data-formatter="imageFormatter" data-escape="false">{{ __('logo') }}</th>
                                 <th scope="col" data-field="name">{{ __('name') }}</th>
                                 <th scope="col" data-field="support_email">{{__('school').' '.__('email')}}</th>
                                 <th scope="col" data-field="support_phone">{{__('school').' '.__('phone')}}</th>
                                 <th scope="col" data-field="tagline">{{ __('tagline') }}</th>
                                 <th scope="col" data-field="address">{{ __('address') }}</th>
                                 <th scope="col" data-field="admin_id" data-visible="false">{{ __('admin').' '.__('id')}}</th>
-                                <th scope="col" data-field="user" data-formatter="schoolAdminFormatter">{{ __('school').' '.__('admin') }}</th>
+                                <th scope="col" data-field="user" data-formatter="schoolAdminFormatter" data-escape="false">{{ __('school').' '.__('admin') }}</th>
                                 <th scope="col" data-field="active_plan">{{ __('active_plan') }}</th>
-                                <th scope="col" data-field="status" data-formatter="activeStatusFormatter">{{ __('status') }}</th>
+                                <th scope="col" data-field="status" data-formatter="activeStatusFormatter" data-escape="false">{{ __('status') }}</th>
                                 <th scope="col" data-field="operate" data-formatter="actionColumnFormatter" data-events="schoolEvents" data-escape="false">{{ __('action') }}</th>
                             </tr>
                             </thead>

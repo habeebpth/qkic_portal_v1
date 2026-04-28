@@ -202,6 +202,69 @@ window.guardianEvents = {
 };
 
 window.studentEvents = {
+    'click .view-student': function (e, value, row) {
+        $('#view_first_name').val(row.user.first_name);
+        $('#view_last_name').val(row.user.last_name);
+        $('#view_mobile').val(row.user.mobile);
+        $('#view_dob').val(moment(row.user.dob, 'YYYY-MM-DD').format('DD-MM-YYYY'));
+        $('#view_session_year').val(row.session_year.name);
+        $('#view_admission_no').val(row.admission_no);
+        $('#view-student-image-tag').attr('src', row.user.image);
+        $('#view-current-address').val(row.user.current_address);
+        $('#view-permanent-address').val(row.user.permanent_address);
+        $('#view_class_section').val(row.class_section.full_name);
+        $('#view_gender').val(row.user.gender);
+
+        $('#view_idcard_num').val(row.user.idcard_num);
+        $('#view_blood_group').val(row.user.blood_group);
+        $('#view_location').val(row.location);
+        $('#view_zone_number').val(row.zone_number);
+        $('#view_street_num').val(row.street_num);
+        $('#view_building_num').val(row.building_num);
+        $('#view_landmark').val(row.landmark);
+        $('#view_current_madrasa').val(row.current_madrasa);
+        $('#view_current_school').val(row.current_school);
+        $('#view_transportation').val(row.transportation);
+
+        $('#view_father_name').val(row.father_name);
+        $('#view_father_mobile').val(row.father_mobile);
+        $('#view_father_whatsapp').val(row.father_whatsapp);
+        $('#view_father_occupation').val(row.father_occupation);
+        $('#view_father_idcard_num').val(row.father_idcard_num);
+
+        $('#view_mother_name').val(row.mother_name);
+        $('#view_mother_mobile').val(row.mother_mobile);
+        $('#view_mother_whatsapp').val(row.mother_whatsapp);
+        $('#view_mother_occupation').val(row.mother_occupation);
+        $('#view_mother_idcard_num').val(row.mother_idcard_num);
+
+        // Fill the Extra Field's Data
+        let extraFieldsHtml = '';
+        if (row.extra_fields.length) {
+            $.each(row.extra_fields, function (index, value) {
+                let data = value.data;
+                // If it's a file, show a link
+                if (value.form_field.type == 'file' && value.data) {
+                    data = '<a href="' + value.file_url + '" target="_blank">View File</a>';
+                }
+                extraFieldsHtml += '<div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">' +
+                    '<label>' + value.form_field.name + '</label>' +
+                    '<div class="form-control" style="background-color: #e9ecef; height: auto; min-height: 38px;">' + data + '</div>' +
+                    '</div>';
+            });
+        }
+        $('#view-extra-fields').html(extraFieldsHtml);
+
+        // Guardian Data
+        $('#view_guardian_email').val(row.guardian.email);
+        $('#view_guardian_first_name').val(row.guardian.first_name);
+        $('#view_guardian_last_name').val(row.guardian.last_name);
+        $('#view_guardian_mobile').val(row.guardian.mobile);
+        $('#view-guardian-image-tag').attr('src', row.guardian.image);
+        $('#view_guardian_gender').val(row.guardian.gender);
+
+        $('#viewModal').modal('show');
+    },
     'click .edit-data': function (e, value, row) {
         $('#edit_first_name').val(row.user.first_name);
         $('#edit_last_name').val(row.user.last_name);
@@ -213,6 +276,35 @@ window.studentEvents = {
         $('#edit-current-address').val(row.user.current_address);
         $('#edit-permanent-address').val(row.user.permanent_address);
         $('#edit_student_class_section_id').val(row.class_section_id);
+
+        $('#edit_idcard_num').val(row.user.idcard_num);
+        $('#edit_blood_group').val(row.user.blood_group);
+        $('#edit_location').val(row.location);
+        $('#edit_zone_number').val(row.zone_number);
+        $('#edit_street_num').val(row.street_num);
+        $('#edit_building_num').val(row.building_num);
+        $('#edit_landmark').val(row.landmark);
+        $('#edit_current_madrasa').val(row.current_madrasa);
+        $('#edit_current_school').val(row.current_school);
+        if (row.transportation == 'yes') {
+            $('#edit_transportation_yes').prop('checked', true);
+            $('#edit_transportation_no').prop('checked', false);
+        } else if (row.transportation == 'no') {
+            $('#edit_transportation_yes').prop('checked', false);
+            $('#edit_transportation_no').prop('checked', true);
+        }
+
+        $('#edit_father_name').val(row.father_name);
+        $('#edit_father_mobile').val(row.father_mobile);
+        $('#edit_father_whatsapp').val(row.father_whatsapp);
+        $('#edit_father_occupation').val(row.father_occupation);
+        $('#edit_father_idcard_num').val(row.father_idcard_num);
+
+        $('#edit_mother_name').val(row.mother_name);
+        $('#edit_mother_mobile').val(row.mother_mobile);
+        $('#edit_mother_whatsapp').val(row.mother_whatsapp);
+        $('#edit_mother_occupation').val(row.mother_occupation);
+        $('#edit_mother_idcard_num').val(row.mother_idcard_num);
 
         if (row.user.gender == 'male') {
             $(document).find('#female').prop('checked', false);
@@ -761,20 +853,20 @@ window.schoolEvents = {
         setTimeout(() => {
             $(".edit-school-admin-search").select2("trigger", "select", {
                 data: {
-                    id: row.user.id ? row.user.id : "",
-                    text: row.user.email ? row.user.email : "",
+                    id: (row.user && row.user.id) ? row.user.id : "",
+                    text: (row.user && row.user.email) ? row.user.email : "",
                     edit_data: true,
                 }
             });
         }, 500);
         setTimeout(() => {
-            $('#edit_admin_email').val(row.user.id);
+            $('#edit_admin_email').val(row.user ? row.user.id : "");
 
             $(".edit-admin-search").val("").trigger("change");
-            $('#edit-admin-first-name').removeAttr('readonly').val(row.user.first_name);
-            $('#edit-admin-last-name').removeAttr('readonly').val(row.user.last_name);
-            $('#edit-admin-contact').removeAttr('readonly').val(row.user.mobile);
-            $("#admin-image-tag").attr('src', row.user.image);
+            $('#edit-admin-first-name').removeAttr('readonly').val(row.user ? row.user.first_name : "");
+            $('#edit-admin-last-name').removeAttr('readonly').val(row.user ? row.user.last_name : "");
+            $('#edit-admin-contact').removeAttr('readonly').val(row.user ? row.user.mobile : "");
+            $("#admin-image-tag").attr('src', row.user ? row.user.image : "");
         }, 1000);
     }
 };

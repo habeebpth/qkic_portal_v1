@@ -203,11 +203,20 @@ class UserService {
         }
 
 
+        $user = $this->user->builder()->withTrashed()->findOrFail($userID);
+
         if ($image) {
-            $studentUserData['image'] = $image;
+            if ($image instanceof UploadedFile) {
+                if ($user->getRawOriginal('image')) {
+                    Storage::disk('public')->delete($user->getRawOriginal('image'));
+                }
+                $studentUserData['image'] = UploadService::upload($image, 'user');
+            } else {
+                $studentUserData['image'] = $image;
+            }
         }
-        //Create Student User First
-        $user = $this->user->update($userID, $studentUserData);
+
+        $user->update($studentUserData);
 
         $studentData = array(
             'guardian_id'     => $guardianID,
@@ -215,7 +224,8 @@ class UserService {
             'class_section_id' => $classSectionID
         );
 
-        $student = $this->student->update($user->student->id, $studentData);
+        $student = $this->student->builder()->withTrashed()->findOrFail($user->student->id);
+        $student->update($studentData);
         $extraDetails = [];
         foreach ($extraFields as $fields) {
             if ($fields['input_type'] == 'file') {

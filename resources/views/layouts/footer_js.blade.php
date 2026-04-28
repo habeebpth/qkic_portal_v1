@@ -116,21 +116,23 @@
         $(document).ready(function() {
             var targetNode = document.querySelector('thead');
 
-            // Apply initial styles
-            $('th[data-field="operate"]').addClass('action-column');
+            if (targetNode) {
+                // Apply initial styles
+                $('th[data-field="operate"]').addClass('action-column');
 
-            // Create an observer instance linked to the callback function
-            var observer = new MutationObserver(function(mutationsList, observer) {
-                for (var mutation of mutationsList) {
-                    if (mutation.type === 'childList') {
-                        // Reapply the class when changes are detected
-                        $('th[data-field="operate"]').addClass('action-column');
+                // Create an observer instance linked to the callback function
+                var observer = new MutationObserver(function(mutationsList, observer) {
+                    for (var mutation of mutationsList) {
+                        if (mutation.type === 'childList') {
+                            // Reapply the class when changes are detected
+                            $('th[data-field="operate"]').addClass('action-column');
+                        }
                     }
-                }
-            });
+                });
 
-            // Start observing the target node for configured mutations
-            observer.observe(targetNode, { childList: true, subtree: true });
+                // Start observing the target node for configured mutations
+                observer.observe(targetNode, { childList: true, subtree: true });
+            }
         });
 
     }, 500);

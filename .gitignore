@@ -4,8 +4,16 @@
 .env.*
 /storage/logs/
 /storage/framework/
+/storage/debugbar/
+/storage/app/public/
 /bootstrap/cache/
 /.idea/
 /.vscode/
 /*.log
 .DS_Store
+.phpunit.result.cache
+/public/hot
+/public/storage
+/auth.json
+*.sql
+*.zip

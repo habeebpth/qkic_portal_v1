@@ -23,7 +23,7 @@ class BootstrapTableService
                 $attributes .= $key . '="' . $value . '" ';
             }
         }
-        return '<a href="' . $url . '" class="' . $class . '" ' . $attributes . '><i class="' . $iconClass . '"></i></a>&nbsp;&nbsp;';
+        return '<a href="' . $url . '" class="' . $class . '" ' . $attributes . '><i class="' . $iconClass . '"></i></a>';
     }
 
     /**

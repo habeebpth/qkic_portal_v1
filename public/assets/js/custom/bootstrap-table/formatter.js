@@ -77,11 +77,6 @@ function yesAndNoStatusFormatter(value) {
 
 function actionColumnFormatter(value, row, index)
 {
-    if (index == 0 || index == 1) {
-        $(".fixed-table-body").css("height",'280px');
-    } else {
-        $(".fixed-table-body").css("height",'100%');
-    }
     return '<div class="action-column-menu">'+ value +'</div>';
 }
 
@@ -299,8 +294,12 @@ function schoolNameFormatter(value, row) {
 
 function schoolAdminFormatter(value, row) {
     let html = '';
-    html += row.user.full_name;
-    html += '<p class="mt-1 text-facebook"><small>' + row.user.email + '</small></p>';
+    if (row.user) {
+        html += row.user.full_name;
+        html += '<p class="mt-1 text-facebook"><small>' + row.user.email + '</small></p>';
+    } else {
+        html += '-';
+    }
     return html;
 }
 
@@ -731,10 +730,12 @@ function shiftStatusFormatter(value, row) {
 }
 
 function activeStatusFormatter(value, row) {
+    let activeMsg = (window.trans && window.trans["Active"]) ? window.trans["Active"] : "Active";
+    let inactiveMsg = (window.trans && window.trans["Inactive"]) ? window.trans["Inactive"] : "Inactive";
     if (row.status == 1) {
-        return "<span class='badge badge-success'>" + window.trans["Active"] + "</span>";
+        return "<span class='badge badge-success'>" + activeMsg + "</span>";
     } else {
-        return "<span class='badge badge-danger'>" + window.trans["Inactive"] + "</span>";
+        return "<span class='badge badge-danger'>" + inactiveMsg + "</span>";
     }
 }
 
