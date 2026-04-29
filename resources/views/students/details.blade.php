@@ -219,7 +219,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
-                                    <label>{{ __('image') }} </label>
+                                    <label>{{ __('Student Image') }} </label>
                                     <input type="file" name="image" class="file-upload-default"/>
                                     <div class="input-group col-xs-12">
                                         <input type="text" class="form-control file-upload-info" disabled="" placeholder="{{ __('image') }}" required="required" id="edit_image"/>
@@ -293,6 +293,7 @@
 
                                     {{-- Loop the FormData --}}
                                     @foreach ($extraFields as $key => $data)
+                                        @php if(in_array(strtolower($data->name), ['zone', 'mother name', 'zone number', 'blood group', 'whatsapp no', 'mother mobile', 'location', 'street number', 'building number', 'landmark', 'current madrasa', 'current school', 'transportation needed', 'student idcard type', 'student idcard num'])) continue; @endphp
                                         @php $fieldName = str_replace(' ', '_', $data->name) @endphp
                                         {{-- Edit Extra Details ID --}}
                                         {{ Form::hidden('extra_fields['.$key.'][id]', '', ['id' => $fieldName.'_id']) }}
@@ -468,7 +469,7 @@
                                 </div>
 
                                 <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
-                                    <label>{{ __('guardian') . ' ' . __('last_name') }} <span class="text-danger">*</span></label>
+                                    <label>{{ __('guardian') . ' ' . __('last_name') }}</label>
                                     {!! Form::text('guardian_last_name', null, ['placeholder' => __('guardian') . ' ' . __('last_name'), 'class' => 'form-control', 'id' => 'edit_guardian_last_name']) !!}
                                 </div>
                                 <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
@@ -495,7 +496,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
-                                    <label>{{ __('image') }} </label>
+                                    <label>{{ __('Guardian Image') }} </label>
                                     <input type="file" name="guardian_image" class="file-upload-default"/>
                                     <div class="input-group col-xs-12">
                                         <input type="text" class="form-control file-upload-info" disabled="" placeholder="{{ __('image') }}" required="required" id="edit_image"/>
@@ -578,7 +579,7 @@
                                 <input type="text" id="view_gender" class="form-control" readonly>
                             </div>
                             <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
-                                <label>{{ __('image') }}</label>
+                                <label>{{ __('Student Image') }}</label>
                                 <div style="width: 100px;">
                                     <img src="" id="view-student-image-tag" class="img-fluid w-100" alt=""/>
                                 </div>
@@ -711,7 +712,7 @@
                                 <input type="text" id="view_guardian_gender" class="form-control" readonly>
                             </div>
                             <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
-                                <label>{{ __('image') }}</label>
+                                <label>{{ __('Guardian Image') }}</label>
                                 <div style="width: 100px;">
                                     <img src="" id="view-guardian-image-tag" class="img-fluid w-100" alt=""/>
                                 </div>

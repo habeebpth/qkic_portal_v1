@@ -284,7 +284,7 @@ function showSweetAlertConfirmPopup(url, method, options = {}) {
         text: opt.text,
         icon: opt.icon,
         showCancelButton: opt.showCancelButton,
-        confirmButtonColor: opt.showCancelButton,
+        confirmButtonColor: opt.confirmButtonColor,
         cancelButtonColor: opt.cancelButtonColor,
         confirmButtonText: opt.confirmButtonText,
         cancelButtonText: opt.cancelButtonText

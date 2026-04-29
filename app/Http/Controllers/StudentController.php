@@ -91,7 +91,7 @@ class StudentController extends Controller {
             'session_year_id'     => 'required|numeric',
             'guardian_email'      => 'required|email',
             'guardian_first_name' => 'required|string',
-            'guardian_last_name'  => 'required|string',
+            'guardian_last_name'  => 'nullable|string',
             'guardian_mobile'     => 'required|numeric',
             'guardian_gender'     => 'required|in:male,female',
             'guardian_image'      => 'nullable|mimes:jpg,jpeg,png|max:4096',
