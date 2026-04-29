@@ -242,6 +242,7 @@ window.studentEvents = {
         let extraFieldsHtml = '';
         if (row.extra_fields.length) {
             $.each(row.extra_fields, function (index, value) {
+                if (['zone', 'mother name', 'zone number', 'blood group', 'whatsapp no', 'mother mobile', 'location', 'street number', 'building number', 'landmark', 'current madrasa', 'current school', 'transportation needed', 'student idcard type', 'student idcard num'].includes(value.form_field.name.toLowerCase())) return true;
                 let data = value.data;
                 // If it's a file, show a link
                 if (value.form_field.type == 'file' && value.data) {

@@ -249,7 +249,7 @@
                                 </div>
 
                                 <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
-                                    <label>{{ __('guardian') . ' ' . __('last_name') }} <span class="text-danger">*</span></label>
+                                    <label>{{ __('guardian') . ' ' . __('last_name') }}</label>
                                     {!! Form::text('guardian_last_name', null, ['placeholder' => __('guardian') . ' ' . __('last_name'), 'class' => 'form-control', 'id' => 'guardian_last_name']) !!}
                                 </div>
                                 <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">

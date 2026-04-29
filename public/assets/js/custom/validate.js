@@ -307,7 +307,6 @@ $(".student-registration-form").validate({
             "email": true,
         },
         'guardian_first_name': "required",
-        'guardian_last_name': "required",
         'guardian_mobile': {
             "number": true,
             "required": true,
@@ -336,7 +335,6 @@ $(".edit-student-registration-form").validate({
         'admission_date': "required",
         'guardian_email': "required",
         'guardian_first_name': "required",
-        'guardian_last_name': "required",
         'guardian_mobile': {
             "number": true,
             "required": true,
