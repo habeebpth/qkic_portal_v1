@@ -848,7 +848,7 @@ Route::get('/js/lang', static function () {
         $files = resource_path('lang/' . $lang . '.json');
         return File::get($files);
     });
-    echo('window.trans = new Proxy(' . $labels . ', { get: function(target, name) { return target.hasOwnProperty(name) ? target[name] : name; } });');
+    echo('window.trans = new Proxy(' . $labels . ', { get: function(target, name) { if (typeof name !== "string") return target[name]; return target.hasOwnProperty(name) ? target[name] : name.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()); } });');
     exit();
 })->name('assets.lang');
 

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Lang;
 
 class AppServiceProvider extends ServiceProvider {
     /**
@@ -37,6 +38,10 @@ class AppServiceProvider extends ServiceProvider {
         //
         Schema::defaultStringLength(191);
         Schema::useNativeSchemaOperationsIfPossible();
+
+        Lang::handleMissingKeysUsing(function ($key, $replacements, $locale) {
+            return ucwords(str_replace('_', ' ', $key));
+        });
 
 //        $this->app['validator']->extend('unique_for_school', function ($attribute, $value, $parameters) {
 //            // Extract and validate the parameters from the rule syntax.
