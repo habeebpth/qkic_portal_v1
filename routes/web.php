@@ -843,9 +843,12 @@ Route::get('dummy-seeder', static function () {
 Route::get('/js/lang', static function () {
     //    https://medium.com/@serhii.matrunchyk/using-laravel-localization-with-javascript-and-vuejs-23064d0c210e
     header('Content-Type: text/javascript');
-    $labels = \Illuminate\Support\Facades\Cache::remember('lang.js', 3600, static function () {
-        $lang = app()->getLocale();
+    $lang = app()->getLocale();
+    $labels = \Illuminate\Support\Facades\Cache::remember('lang.js.' . $lang, 3600, static function () use ($lang) {
         $files = resource_path('lang/' . $lang . '.json');
+        if (!File::exists($files)) {
+            $files = resource_path('lang/en.json');
+        }
         return File::get($files);
     });
     echo('window.trans = new Proxy(' . $labels . ', { get: function(target, name) { if (typeof name !== "string") return target[name]; return target.hasOwnProperty(name) ? target[name] : name.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()); } });');
