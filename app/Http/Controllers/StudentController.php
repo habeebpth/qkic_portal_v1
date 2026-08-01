@@ -831,5 +831,101 @@ class StudentController extends Controller {
         }
     }
 
-    
+    public function changeSessionYearIndex() {
+        ResponseService::noAnyPermissionThenRedirect(['student-create', 'student-edit', 'student-list']);
+        $class_sections = $this->classSection->all(['*'], ['class', 'class.stream', 'section', 'medium']);
+        $sessionYears = $this->sessionYear->all();
+        $defaultSessionYear = $this->cache->getDefaultSessionYear();
+
+        return view('students.change_session_year', compact('class_sections', 'sessionYears', 'defaultSessionYear'));
+    }
+
+    public function changeSessionYearList(Request $request) {
+        ResponseService::noAnyPermissionThenSendJson(['student-create', 'student-edit', 'student-list']);
+        $offset = $request->offset ?? 0;
+        $limit = $request->limit ?? 10;
+        $sort = $request->sort ?? 'id';
+        $order = $request->order ?? 'DESC';
+
+        $sql = $this->student->builder()->with(['user:id,first_name,last_name,image,email', 'class_section.class', 'class_section.section', 'session_year']);
+
+        if ($request->filled('source_session_year_id')) {
+            $sql->where('session_year_id', $request->source_session_year_id);
+        }
+
+        if ($request->filled('class_section_id')) {
+            $sql->where('class_section_id', $request->class_section_id);
+        }
+
+        if ($request->filled('status')) {
+            $status = $request->status;
+            $sql->whereHas('user', function ($query) use ($status) {
+                if ($status == '0') {
+                    $query->where('status', 0)->withTrashed();
+                } else {
+                    $query->where('status', 1);
+                }
+            });
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $sql->where(function ($query) use ($search) {
+                $query->where('admission_no', 'LIKE', "%$search%")
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('first_name', 'LIKE', "%$search%")
+                            ->orWhere('last_name', 'LIKE', "%$search%")
+                            ->orWhereRaw("concat(first_name,' ',last_name) LIKE '%$search%'");
+                    });
+            });
+        }
+
+        $total = $sql->count();
+        $sql->orderBy($sort, $order)->skip($offset)->take($limit);
+        $res = $sql->get();
+
+        $rows = array();
+        $no = 1;
+        foreach ($res as $row) {
+            $tempRow = $row->toArray();
+            $tempRow['no'] = $no++;
+            $tempRow['student_id'] = $row->id;
+            $tempRow['student_name'] = $row->user ? $row->user->full_name : '';
+            $tempRow['admission_no'] = $row->admission_no;
+            $tempRow['class_name'] = $row->class_section ? $row->class_section->full_name : '';
+            $tempRow['current_session_year'] = $row->session_year ? $row->session_year->name : '-';
+            $tempRow['status_text'] = ($row->user && $row->user->status == 1) 
+                ? '<span class="badge badge-success">Active</span>' 
+                : '<span class="badge badge-danger">Inactive / Pending</span>';
+            $rows[] = $tempRow;
+        }
+
+        $bulkData['total'] = $total;
+        $bulkData['rows'] = $rows;
+        return response()->json($bulkData);
+    }
+
+    public function changeSessionYearUpdate(Request $request) {
+        ResponseService::noAnyPermissionThenSendJson(['student-create', 'student-edit']);
+        $request->validate([
+            'student_ids' => 'required',
+            'target_session_year_id' => 'required|numeric|exists:session_years,id'
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $studentIds = is_array($request->student_ids) ? $request->student_ids : explode(',', $request->student_ids);
+            
+            \App\Models\Students::whereIn('id', $studentIds)->update([
+                'session_year_id' => $request->target_session_year_id
+            ]);
+
+            DB::commit();
+            return ResponseService::successResponse('Session year updated successfully for selected students');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            ResponseService::logErrorResponse($th);
+            return ResponseService::errorResponse();
+        }
+    }
 }

@@ -267,6 +267,11 @@ Route::group(['middleware' => ['Role', 'auth', 'checkSchoolStatus', 'status']], 
             Route::get('generate-id-card', [StudentController::class, 'generate_id_card_index'])->name('students.generate-id-card-index');
             Route::post('generate-id-card', [StudentController::class, 'generate_id_card'])->name('students.generate-id-card');
 
+            /*** Change Session Year ***/
+            Route::get('change-session-year', [StudentController::class, 'changeSessionYearIndex'])->name('students.change-session-year.index');
+            Route::get('change-session-year-list', [StudentController::class, 'changeSessionYearList'])->name('students.change-session-year.list');
+            Route::post('change-session-year', [StudentController::class, 'changeSessionYearUpdate'])->name('students.change-session-year.update');
+
         });
         Route::resource('students', StudentController::class);
 Route::get('students-export', [App\Http\Controllers\StudentController::class, 'exportAllData'])->name('students.export-all');

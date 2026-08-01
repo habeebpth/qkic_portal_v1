@@ -755,6 +755,7 @@
                 <i class="fas fa-school"></i>
                 <select class="form-select @error('class_admission') is-invalid @enderror" name="class_admission" id="class_admission" required>
                   <option value="">Select Class</option>
+                  <option value="30" {{ old('class_admission') == '30' ? 'selected' : '' }}>KG</option>
                   <option value="18" {{ old('class_admission') == '18' ? 'selected' : '' }}>1</option>
                   <option value="20" {{ old('class_admission') == '20' ? 'selected' : '' }}>2</option>
                   <option value="22" {{ old('class_admission') == '22' ? 'selected' : '' }}>3</option>

@@ -407,9 +407,12 @@ class Controller extends BaseController
             DB::beginTransaction();
             $admission_date = date('Y-m-d');
 
-            $sessionYearId = 9;
+            $defaultSessionYear = app(CachingService::class)->getDefaultSessionYear(5);
+            $sessionYearId = $defaultSessionYear->id ?? 9;
+            $sessionYearName = $defaultSessionYear->name ?? date('Y') . '-' . substr(date('Y') + 1, -2);
+
             $get_student = Students::where('school_id', 5)->latest('id')->withTrashed()->pluck('id')->first();
-            $admission_no = '2026-27' . '0' . '5' . '0' . ($get_student + 1);
+            $admission_no = $sessionYearName . '0' . '5' . '0' . ($get_student + 1);
 
 
             // Split the name into first name and last name
