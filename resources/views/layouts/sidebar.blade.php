@@ -115,6 +115,7 @@
 
                         @can('student-edit')
                             <li class="nav-item"><a href="{{ route('students.upload-profile') }}" class="nav-link">{{ __('upload_profile_images') }}</a></li>
+                            <li class="nav-item"><a href="{{ route('students.change-session-year.index') }}" class="nav-link">{{ __('Change Session Year') }}</a></li>
                         @endcan
 
                         {{-- parents --}}
