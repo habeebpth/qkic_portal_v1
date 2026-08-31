@@ -98,6 +98,27 @@
                                     </span>
                                 </div>
 
+                                <input type="hidden" name="idcard_type" id="idcard_type" value="QID">
+                                <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                    <label>{{ __('Qatar ID Number') }}</label>
+                                    {!! Form::text('idcard_num', null, ['placeholder' => __('Qatar ID Number'), 'class' => 'form-control', 'id' => 'idcard_num']) !!}
+                                </div>
+
+                                <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                                    <label>{{ __('Blood Group') }}</label>
+                                    <select name="blood_group" id="blood_group" class="form-control select2">
+                                        <option value="">{{ __('select') . ' ' . __('Blood Group') }}</option>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                    </select>
+                                </div>
+
                                 <div class="form-group col-sm-12 col-md-12 col-lg-6 col-xl-4">
                                     <label>{{ __('gender') }} <span class="text-danger">*</span></label><br>
                                     <div class="d-flex">
@@ -139,11 +160,59 @@
                                 </div>
                             </div>
 
+                            <hr>
+                            <div class="row mt-5">
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Location') }}</label>
+                                    {!! Form::text('location', null, ['placeholder' => __('Location'), 'class' => 'form-control', 'id' => 'location']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Zone Number') }}</label>
+                                    {!! Form::text('zone_number', null, ['placeholder' => __('Zone Number'), 'class' => 'form-control', 'id' => 'zone_number']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Street Number') }}</label>
+                                    {!! Form::text('street_num', null, ['placeholder' => __('Street Number'), 'class' => 'form-control', 'id' => 'street_num']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Building Number') }}</label>
+                                    {!! Form::text('building_num', null, ['placeholder' => __('Building Number'), 'class' => 'form-control', 'id' => 'building_num']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Landmark') }}</label>
+                                    {!! Form::text('landmark', null, ['placeholder' => __('Landmark'), 'class' => 'form-control', 'id' => 'landmark']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Current Madrasa') }}</label>
+                                    {!! Form::text('current_madrasa', null, ['placeholder' => __('Current Madrasa'), 'class' => 'form-control', 'id' => 'current_madrasa']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Current School') }}</label>
+                                    {!! Form::text('current_school', null, ['placeholder' => __('Current School'), 'class' => 'form-control', 'id' => 'current_school']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>{{ __('Transportation Required') }}</label><br>
+                                    <div class="d-flex">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label">
+                                                {!! Form::radio('transportation', 'yes') !!} Yes
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label">
+                                                {!! Form::radio('transportation', 'no') !!} No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             @if(count($extraFields))
                                 <div class="row other-details">
 
                                     {{-- Loop the FormData --}}
                                     @foreach ($extraFields as $key => $data)
+                                        @php if(in_array(strtolower($data->name), ['zone', 'mother name', 'zone number', 'blood group', 'whatsapp no', 'mother mobile', 'location', 'street number', 'building number', 'landmark', 'current madrasa', 'current school', 'transportation needed', 'student idcard type', 'student idcard num'])) continue; @endphp
                                         {{-- Edit Extra Details ID --}}
                                         {{ Form::hidden('extra_fields['.$key.'][id]', '', ['id' => $data->type.'_'.$key.'_id']) }}
 
@@ -233,6 +302,60 @@
                                     @endforeach
                                 </div>
                             @endif
+
+                            <hr>
+                            {{-- Father Details --}}
+                            <h5 class="mb-3">Father's Details</h5>
+                            <div class="row">
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Father's Name</label>
+                                    {!! Form::text('father_name', null, ['placeholder' => __('Father Name'), 'class' => 'form-control', 'id' => 'father_name']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Mobile Number</label>
+                                    {!! Form::number('father_mobile', null, ['placeholder' => __('Mobile'), 'min' => 1, 'class' => 'form-control remove-number-increment', 'id' => 'father_mobile']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>WhatsApp Number</label>
+                                    {!! Form::number('father_whatsapp', null, ['placeholder' => __('WhatsApp Number'), 'min' => 1, 'class' => 'form-control remove-number-increment', 'id' => 'father_whatsapp']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Occupation</label>
+                                    {!! Form::text('father_occupation', null, ['placeholder' => __('Occupation'), 'class' => 'form-control', 'id' => 'father_occupation']) !!}
+                                </div>
+                                <input type="hidden" name="father_idcard_type" id="father_idcard_type" value="QID">
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Qatar ID Number</label>
+                                    {!! Form::text('father_idcard_num', null, ['placeholder' => __('Qatar ID Number'), 'class' => 'form-control', 'id' => 'father_idcard_num']) !!}
+                                </div>
+                            </div>
+
+                            <hr>
+                            {{-- Mother Details --}}
+                            <h5 class="mb-3">Mother's Details</h5>
+                            <div class="row">
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Mother's Name</label>
+                                    {!! Form::text('mother_name', null, ['placeholder' => __('Mother Name'), 'class' => 'form-control', 'id' => 'mother_name']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Mobile Number</label>
+                                    {!! Form::number('mother_mobile', null, ['placeholder' => __('Mobile'), 'min' => 1, 'class' => 'form-control remove-number-increment', 'id' => 'mother_mobile']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>WhatsApp Number</label>
+                                    {!! Form::number('mother_whatsapp', null, ['placeholder' => __('WhatsApp Number'), 'min' => 1, 'class' => 'form-control remove-number-increment', 'id' => 'mother_whatsapp']) !!}
+                                </div>
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Occupation</label>
+                                    {!! Form::text('mother_occupation', null, ['placeholder' => __('Occupation'), 'class' => 'form-control', 'id' => 'mother_occupation']) !!}
+                                </div>
+                                <input type="hidden" name="mother_idcard_type" id="mother_idcard_type" value="QID">
+                                <div class="form-group col-sm-12 col-md-4">
+                                    <label>Qatar ID Number</label>
+                                    {!! Form::text('mother_idcard_num', null, ['placeholder' => __('Qatar ID Number'), 'class' => 'form-control', 'id' => 'mother_idcard_num']) !!}
+                                </div>
+                            </div>
 
                             <hr>
                             {{-- Guardian Details --}}
