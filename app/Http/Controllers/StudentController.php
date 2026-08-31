@@ -96,6 +96,26 @@ class StudentController extends Controller {
             'guardian_gender'     => 'required|in:male,female',
             'guardian_image'      => 'nullable|mimes:jpg,jpeg,png|max:4096',
             'status'              => 'nullable|in:0,1',
+            'blood_group'         => 'nullable|string',
+            'idcard_num'          => 'nullable|string',
+            'location'            => 'nullable|string',
+            'zone_number'         => 'nullable|string',
+            'street_num'          => 'nullable|string',
+            'building_num'        => 'nullable|string',
+            'landmark'            => 'nullable|string',
+            'current_madrasa'     => 'nullable|string',
+            'current_school'      => 'nullable|string',
+            'transportation'      => 'nullable|string',
+            'father_name'         => 'nullable|string',
+            'father_mobile'       => 'nullable|numeric',
+            'father_whatsapp'     => 'nullable|numeric',
+            'father_occupation'   => 'nullable|string',
+            'father_idcard_num'   => 'nullable|string',
+            'mother_name'         => 'nullable|string',
+            'mother_mobile'       => 'nullable|numeric',
+            'mother_whatsapp'     => 'nullable|numeric',
+            'mother_occupation'   => 'nullable|string',
+            'mother_idcard_num'   => 'nullable|string',
         ]);
 
         try {
@@ -139,7 +159,40 @@ class StudentController extends Controller {
             $sessionYear = $this->sessionYear->findById($request->session_year_id);
             $guardian = $userService->createOrUpdateParent($request->guardian_first_name, $request->guardian_last_name, $request->guardian_email, $request->guardian_mobile, $request->guardian_gender, $request->guardian_image);
 
-            $userService->createStudentUser($request->first_name, $request->last_name, $request->admission_no, $request->mobile, $request->dob, $request->gender, $request->image, $request->class_section_id, $request->admission_date, $request->current_address, $request->permanent_address, $sessionYear->id, $guardian->id, $request->extra_fields ?? [], $request->status ?? 0);
+            $studentUser = $userService->createStudentUser($request->first_name, $request->last_name, $request->admission_no, $request->mobile, $request->dob, $request->gender, $request->image, $request->class_section_id, $request->admission_date, $request->current_address, $request->permanent_address, $sessionYear->id, $guardian->id, $request->extra_fields ?? [], $request->status ?? 0);
+
+            // Also store the admission-form fields (blood group, ID card, address, academic, father & mother details)
+            $studentUser->update([
+                'blood_group' => $request->blood_group,
+                'idcard_type' => $request->idcard_type,
+                'idcard_num'  => $request->idcard_num,
+            ]);
+
+            $studentRecord = \App\Models\Students::where('user_id', $studentUser->id)->first();
+            if ($studentRecord) {
+                $studentRecord->update([
+                    'location'           => $request->location,
+                    'zone_number'        => $request->zone_number,
+                    'street_num'         => $request->street_num,
+                    'building_num'       => $request->building_num,
+                    'landmark'           => $request->landmark,
+                    'current_madrasa'    => $request->current_madrasa,
+                    'current_school'     => $request->current_school,
+                    'transportation'     => $request->transportation,
+                    'father_name'        => $request->father_name,
+                    'father_mobile'      => $request->father_mobile,
+                    'father_whatsapp'    => $request->father_whatsapp,
+                    'father_occupation'  => $request->father_occupation,
+                    'father_idcard_type' => $request->father_idcard_type,
+                    'father_idcard_num'  => $request->father_idcard_num,
+                    'mother_name'        => $request->mother_name,
+                    'mother_mobile'      => $request->mother_mobile,
+                    'mother_whatsapp'    => $request->mother_whatsapp,
+                    'mother_occupation'  => $request->mother_occupation,
+                    'mother_idcard_type' => $request->mother_idcard_type,
+                    'mother_idcard_num'  => $request->mother_idcard_num,
+                ]);
+            }
 
             DB::commit();
             ResponseService::successResponse('Data Stored Successfully');
@@ -235,7 +288,7 @@ class StudentController extends Controller {
         $offset = request('offset', 0);
         $limit = request('limit', 10);
         $sort = request('sort', 'id');
-        $order = request('order', 'ASC');
+        $order = strtolower(request('order', 'ASC')) === 'desc' ? 'desc' : 'asc';
         $search = request('search');
 
         $sql = $this->student->builder()->with('user.extra_student_details.form_field', 'guardian', 'class_section.class.stream', 'class_section.section', 'class_section.medium', 'session_year')
@@ -292,8 +345,39 @@ class StudentController extends Controller {
         }
 
         $total = $sql->count();
+
+        // Columns that live on a related table (user/guardian) rather than directly on `students`.
+        // orderBy() can't reach these without a join, so map each to an explicit joined column/expression.
+        $sortableRelations = [
+            'user.full_name'     => ['table' => 'su', 'raw' => "CONCAT(su.first_name, ' ', su.last_name)"],
+            'user.dob'           => ['table' => 'su', 'column' => 'dob'],
+            'user.gender'        => ['table' => 'su', 'column' => 'gender'],
+            'user.email'         => ['table' => 'su', 'column' => 'email'],
+            'user.mobile'        => ['table' => 'su', 'column' => 'mobile'],
+            'user.blood_group'   => ['table' => 'su', 'column' => 'blood_group'],
+            'user.idcard_type'   => ['table' => 'su', 'column' => 'idcard_type'],
+            'user.idcard_num'    => ['table' => 'su', 'column' => 'idcard_num'],
+            'guardian.full_name' => ['table' => 'gu', 'raw' => "CONCAT(gu.first_name, ' ', gu.last_name)"],
+            'guardian.mobile'    => ['table' => 'gu', 'column' => 'mobile'],
+            'guardian.email'     => ['table' => 'gu', 'column' => 'email'],
+            'guardian.gender'    => ['table' => 'gu', 'column' => 'gender'],
+        ];
+
         if (!empty($request->class_id)) {
             $sql = $sql->orderBy('roll_number', 'ASC');
+        } elseif (isset($sortableRelations[$sort])) {
+            $relation = $sortableRelations[$sort];
+            $foreignKey = $relation['table'] === 'su' ? 'students.user_id' : 'students.guardian_id';
+            // Join a narrow subquery (only the columns we need) rather than the full `users` table,
+            // so shared column names like `school_id`/`id` on `users` can never collide with `students`
+            // or with other unqualified `where` clauses (e.g. school-scoping) applied to this query.
+            $userColumns = DB::table('users')->select(['id', 'first_name', 'last_name', 'dob', 'gender', 'email', 'mobile', 'blood_group', 'idcard_type', 'idcard_num']);
+            $sql->select('students.*')->leftJoinSub($userColumns, $relation['table'], $relation['table'] . '.id', '=', $foreignKey);
+            if (isset($relation['raw'])) {
+                $sql->orderByRaw($relation['raw'] . ' ' . $order);
+            } else {
+                $sql->orderBy($relation['table'] . '.' . $relation['column'], $order);
+            }
         } else {
             $sql = $sql->orderBy($sort, $order);
         }

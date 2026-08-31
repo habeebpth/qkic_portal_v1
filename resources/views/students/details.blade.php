@@ -67,50 +67,50 @@
                                         <th scope="col" data-field="id" data-sortable="true" data-visible="false">{{ __('id') }}</th>
                                         <th scope="col" data-field="no">{{ __('no.') }}</th>
                                         <th scope="col" data-field="user.id" data-visible="false">{{ __('User Id') }}</th>
-                                        <th scope="col" data-field="user.full_name">{{ __('name') }}</th>
-                                        <th scope="col" data-field="user.dob" data-formatter="dateFormatter">{{ __('dob') }}</th>
+                                        <th scope="col" data-field="user.full_name" data-sortable="true">{{ __('name') }}</th>
+                                        <th scope="col" data-field="user.dob" data-formatter="dateFormatter" data-sortable="true">{{ __('dob') }}</th>
                                         <th scope="col" data-field="user.image" data-formatter="imageFormatter">{{ __('image') }}</th>
                                         <th scope="col" data-field="class_section.full_name">{{ __('class_section') }}</th>
-                                        <th scope="col" data-field="admission_no"> {{ __('Gr Number') }}</th>
-                                        <th scope="col" data-field="roll_number">{{ __('roll_no') }}</th>
-                                        <th scope="col" data-field="user.gender">{{ __('gender') }}</th>
-                                        <th scope="col" data-field="admission_date" data-formatter="dateFormatter">{{ __('admission_date') }}</th>
-                                        <th scope="col" data-field="father_name">{{ __('father_name') }}</th>
-                                        <th scope="col" data-field="father_mobile">{{ __('father_mobile') }}</th>
-                                        <th scope="col" data-field="father_whatsapp">{{ __('father_whatsapp') }}</th>
-                                        <th scope="col" data-field="father_occupation">{{ __('father_occupation') }}</th>
-                                        <th scope="col" data-field="mother_name">{{ __('mother_name') }}</th>
-                                        <th scope="col" data-field="mother_mobile">{{ __('mother_mobile') }}</th>
-                                        <th scope="col" data-field="mother_whatsapp">{{ __('mother_whatsapp') }}</th>
-                                        <th scope="col" data-field="mother_occupation">{{ __('mother_occupation') }}</th>
-                                        <th scope="col" data-field="user.email" data-visible="true">{{ __('email') }}</th>
-                                        <th scope="col" data-field="user.mobile" data-visible="true">{{ __('mobile') }}</th>
-                                        <th scope="col" data-field="user.blood_group" data-visible="false">{{ __('blood_group') }}</th>
-                                        <th scope="col" data-field="user.idcard_type" data-visible="false">{{ __('student_id_card_type') }}</th>
-                                        <th scope="col" data-field="user.idcard_num" data-visible="false">{{ __('student_id_card_num') }}</th>
+                                        <th scope="col" data-field="admission_no" data-sortable="true"> {{ __('Gr Number') }}</th>
+                                        <th scope="col" data-field="roll_number" data-sortable="true">{{ __('roll_no') }}</th>
+                                        <th scope="col" data-field="user.gender" data-sortable="true">{{ __('gender') }}</th>
+                                        <th scope="col" data-field="admission_date" data-formatter="dateFormatter" data-sortable="true">{{ __('admission_date') }}</th>
+                                        <th scope="col" data-field="father_name" data-sortable="true">{{ __('father_name') }}</th>
+                                        <th scope="col" data-field="father_mobile" data-sortable="true">{{ __('father_mobile') }}</th>
+                                        <th scope="col" data-field="father_whatsapp" data-sortable="true">{{ __('father_whatsapp') }}</th>
+                                        <th scope="col" data-field="father_occupation" data-sortable="true">{{ __('father_occupation') }}</th>
+                                        <th scope="col" data-field="mother_name" data-sortable="true">{{ __('mother_name') }}</th>
+                                        <th scope="col" data-field="mother_mobile" data-sortable="true">{{ __('mother_mobile') }}</th>
+                                        <th scope="col" data-field="mother_whatsapp" data-sortable="true">{{ __('mother_whatsapp') }}</th>
+                                        <th scope="col" data-field="mother_occupation" data-sortable="true">{{ __('mother_occupation') }}</th>
+                                        <th scope="col" data-field="user.email" data-visible="true" data-sortable="true">{{ __('email') }}</th>
+                                        <th scope="col" data-field="user.mobile" data-visible="true" data-sortable="true">{{ __('mobile') }}</th>
+                                        <th scope="col" data-field="user.blood_group" data-visible="false" data-sortable="true">{{ __('blood_group') }}</th>
+                                        <th scope="col" data-field="user.idcard_type" data-visible="false" data-sortable="true">{{ __('student_id_card_type') }}</th>
+                                        <th scope="col" data-field="user.idcard_num" data-visible="false" data-sortable="true">{{ __('student_id_card_num') }}</th>
 
                                         <th scope="col" data-field="user.current_address" data-visible="false">{{ __('current_address') }}</th>
                                         <th scope="col" data-field="user.permanent_address" data-visible="false">{{ __('permanent_address') }}</th>
 
-                                        <th scope="col" data-field="location" data-visible="true">{{ __('location') }}</th>
-                                        <th scope="col" data-field="zone_number" data-visible="false">{{ __('zone_number') }}</th>
-                                        <th scope="col" data-field="street_num" data-visible="false">{{ __('street_num') }}</th>
-                                        <th scope="col" data-field="building_num" data-visible="false">{{ __('building_num') }}</th>
-                                        <th scope="col" data-field="landmark" data-visible="false">{{ __('landmark') }}</th>
+                                        <th scope="col" data-field="location" data-visible="true" data-sortable="true">{{ __('location') }}</th>
+                                        <th scope="col" data-field="zone_number" data-visible="false" data-sortable="true">{{ __('zone_number') }}</th>
+                                        <th scope="col" data-field="street_num" data-visible="false" data-sortable="true">{{ __('street_num') }}</th>
+                                        <th scope="col" data-field="building_num" data-visible="false" data-sortable="true">{{ __('building_num') }}</th>
+                                        <th scope="col" data-field="landmark" data-visible="false" data-sortable="true">{{ __('landmark') }}</th>
 
-                                        <th scope="col" data-field="current_madrasa" data-visible="false">{{ __('current_madrasa') }}</th>
-                                        <th scope="col" data-field="current_school" data-visible="false">{{ __('current_school') }}</th>
-                                        <th scope="col" data-field="transportation" data-visible="false">{{ __('transportation') }}</th>
+                                        <th scope="col" data-field="current_madrasa" data-visible="false" data-sortable="true">{{ __('current_madrasa') }}</th>
+                                        <th scope="col" data-field="current_school" data-visible="false" data-sortable="true">{{ __('current_school') }}</th>
+                                        <th scope="col" data-field="transportation" data-visible="false" data-sortable="true">{{ __('transportation') }}</th>
 
-                                        <th scope="col" data-field="father_idcard_type" data-visible="false">{{ __('father_idcard_type') }}</th>
-                                        <th scope="col" data-field="father_idcard_num" data-visible="false">{{ __('father_idcard_num') }}</th>
-                                        <th scope="col" data-field="mother_idcard_type" data-visible="false">{{ __('mother_idcard_type') }}</th>
-                                        <th scope="col" data-field="mother_idcard_num" data-visible="false">{{ __('mother_idcard_num') }}</th>
+                                        <th scope="col" data-field="father_idcard_type" data-visible="false" data-sortable="true">{{ __('father_idcard_type') }}</th>
+                                        <th scope="col" data-field="father_idcard_num" data-visible="false" data-sortable="true">{{ __('father_idcard_num') }}</th>
+                                        <th scope="col" data-field="mother_idcard_type" data-visible="false" data-sortable="true">{{ __('mother_idcard_type') }}</th>
+                                        <th scope="col" data-field="mother_idcard_num" data-visible="false" data-sortable="true">{{ __('mother_idcard_num') }}</th>
 
-                                        <th scope="col" data-field="guardian.full_name" data-visible="true">{{ __('guardian_name') }}</th>
-                                        <th scope="col" data-field="guardian.mobile" data-visible="true">{{ __('guardian_mobile') }}</th>
-                                        <th scope="col" data-field="guardian.email" data-visible="false">{{ __('guardian_email') }}</th>
-                                        <th scope="col" data-field="guardian.gender" data-visible="false">{{ __('guardian_gender') }}</th>
+                                        <th scope="col" data-field="guardian.full_name" data-visible="true" data-sortable="true">{{ __('guardian_name') }}</th>
+                                        <th scope="col" data-field="guardian.mobile" data-visible="true" data-sortable="true">{{ __('guardian_mobile') }}</th>
+                                        <th scope="col" data-field="guardian.email" data-visible="false" data-sortable="true">{{ __('guardian_email') }}</th>
+                                        <th scope="col" data-field="guardian.gender" data-visible="false" data-sortable="true">{{ __('guardian_gender') }}</th>
 
                                         {{-- Admission form fields --}}
                                         @foreach ($extraFields as $field)
@@ -804,6 +804,10 @@
                 }
             })
         })
+
+        $('#filter_class_section_id, #filter_session_year_id').on('change', function() {
+            $('#table_list').bootstrapTable('refresh');
+        });
 
         $('#export-all-students').on('click', function(e) {
             e.preventDefault();

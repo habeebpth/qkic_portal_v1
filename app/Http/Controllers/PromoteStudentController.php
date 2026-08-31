@@ -87,7 +87,9 @@ class PromoteStudentController extends Controller {
                 $orderBy = !empty($this->cache->getSchoolSettings('roll_number_sort_order')) ? $this->cache->getSchoolSettings('roll_number_sort_order') : 'asc';
 
                 // Get The Data of Users who is passed with Student Relation and make Array to Update Student Details
-                $studentUsers = $this->user->builder()->role('Student')->whereIn('id',$passStudentsIds)->with('student')->orderBy('users.'.$sortBy, $orderBy)->get();
+                $studentUsers = $this->user->builder()->role('Student')->whereHas('student', function($q) use ($passStudentsIds) {
+                    $q->whereIn('id', $passStudentsIds);
+                })->with('student')->orderBy('users.'.$sortBy, $orderBy)->get();
                 $studentsData = array();
                 foreach ($studentUsers as $key => $user) {
                     $studentsData[] = array(
@@ -103,13 +105,14 @@ class PromoteStudentController extends Controller {
             }
 
             if (!empty($failStudentsIds)) {
-                $this->student->builder()->whereIn('user_id', $failStudentsIds)->update(array(
+                $this->student->builder()->whereIn('id', $failStudentsIds)->update(array(
                     'session_year_id' => $request->session_year_id,
                 ));
             }
 
             if (!empty($leftStudentSIds)) {
-                $this->user->builder()->whereIn('id', $leftStudentSIds)->update(['status' => 0,'deleted_at' => now()]);
+                $leftUserIds = $this->student->builder()->whereIn('id', $leftStudentSIds)->pluck('user_id');
+                $this->user->builder()->whereIn('id', $leftUserIds)->update(['status' => 0,'deleted_at' => now()]);
             }
             $this->promoteStudent->upsert($promoteStudentData, ['class_section', 'student_id', 'session_year_id'], ['status', 'result']);
             DB::commit();
