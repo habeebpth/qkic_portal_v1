@@ -226,9 +226,25 @@ class StudentController extends Controller {
             'session_year_id' => 'required|numeric',
             'guardian_email'  => 'required|email|unique:users,email',
         ];
+
+        // Determine the guardian's user ID to exclude from the unique check.
+        // guardian_id from the form may be empty/non-numeric when select2 loses
+        // its value (e.g. after changing class section), so fall back to the DB.
+        $guardianUserId = null;
         if (is_numeric($request->guardian_id)) {
-            $rules['guardian_email'] = 'required|email|unique:users,email,' . $request->guardian_id;
+            $guardianUserId = $request->guardian_id;
+        } else {
+            // Look up the current student's guardian from the DB
+            $currentStudent = \App\Models\Students::withTrashed()->where('user_id', $id)->first();
+            if ($currentStudent && is_numeric($currentStudent->guardian_id)) {
+                $guardianUserId = $currentStudent->guardian_id;
+            }
         }
+
+        if ($guardianUserId) {
+            $rules['guardian_email'] = 'required|email|unique:users,email,' . $guardianUserId;
+        }
+
         $request->validate($rules);
 
         try {
