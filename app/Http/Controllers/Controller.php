@@ -440,7 +440,7 @@ class Controller extends BaseController
                 'status' => 0,
                 'current_address' => $request->location . ', Zone: ' . $request->zone_number . ', Street: ' . $request->street_num . ', Building: ' . $request->building_num,
                 'permanent_address' => $request->location . ', Zone: ' . $request->zone_number . ', Street: ' . $request->street_num . ', Building: ' . $request->building_num,
-                'deleted_at' => null
+                'deleted_at' => now()
             ]);
             $user->assignRole('Student');
 
@@ -470,7 +470,7 @@ class Controller extends BaseController
                     'status' => 0,
                     'current_address' => $request->location . ', Zone: ' . $request->zone_number . ', Street: ' . $request->street_num . ', Building: ' . $request->building_num,
                     'permanent_address' => $request->location . ', Zone: ' . $request->zone_number . ', Street: ' . $request->street_num . ', Building: ' . $request->building_num,
-                    'deleted_at' => null
+                    'deleted_at' => now()
                 ]);
                 $user_parent->assignRole('Guardian');
             }
