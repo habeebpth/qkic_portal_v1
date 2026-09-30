@@ -74,15 +74,24 @@ class DashboardController extends Controller {
         // School Admin Dashboard
         if (Auth::user()->hasRole('School Admin') || Auth::user()->school_id) {
             // Counters
+            $defaultSessionYear = $this->cache->getDefaultSessionYear();
             $teacher = $this->user->builder()->role("Teacher")->count();
-            $student = $this->user->builder()->role("Student")->where('status', 1)->count();
-            $parent = $this->user->guardian()->where('status', 1)->whereHas('child.user', function ($q) {
-                $q->owner();
+            $student = $this->user->builder()->role("Student")->where('status', 1)->whereHas('student', function ($q) use ($defaultSessionYear) {
+                $q->where('session_year_id', $defaultSessionYear->id);
+            })->count();
+            $parent = $this->user->guardian()->where('status', 1)->whereHas('child', function ($q) use ($defaultSessionYear) {
+                $q->where('session_year_id', $defaultSessionYear->id)->whereHas('user', function ($q2) {
+                    $q2->owner();
+                });
             })->count();
 
             if ($student > 0) {
-                $boys_count = $this->user->builder()->role('Student')->where('status', 1)->where('gender', 'male')->count();
-                $girls_count = $this->user->builder()->role('Student')->where('status', 1)->where('gender', 'female')->count();
+                $boys_count = $this->user->builder()->role('Student')->where('status', 1)->where('gender', 'male')->whereHas('student', function ($q) use ($defaultSessionYear) {
+                    $q->where('session_year_id', $defaultSessionYear->id);
+                })->count();
+                $girls_count = $this->user->builder()->role('Student')->where('status', 1)->where('gender', 'female')->whereHas('student', function ($q) use ($defaultSessionYear) {
+                    $q->where('session_year_id', $defaultSessionYear->id);
+                })->count();
                 $boys = round((($boys_count * 100) / $student), 2);
                 $girls = round(($girls_count * 100) / $student, 2);
                 $total_students = $student;
@@ -125,8 +134,6 @@ class DashboardController extends Controller {
             }
 
             $previous_subscriptions = $this->subscription->builder()->with('subscription_bill.transaction')->get()->whereIn('status', [3, 4, 5]);
-
-            $defaultSessionYear = $this->cache->getDefaultSessionYear();
 
             $holiday = $this->holiday->builder()->whereDate('date', '>=', Carbon::now()->format('Y-m-d'))->whereDate('date', '<=', $defaultSessionYear->end_date)->orderBy('date', 'ASC')->get();
 
