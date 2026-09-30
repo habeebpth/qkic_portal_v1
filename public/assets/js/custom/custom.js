@@ -509,29 +509,6 @@ select2Search($(".guardian-search"), baseUrl + "/guardian/search", null, 'Search
     return repo.email || repo.text;
 });
 
-select2Search($(".edit-guardian-search"), baseUrl + "/guardian/search", null, 'Search for Guardian Email', Select2SearchDesignTemplate, function (repo) {
-    if (!repo.text) {
-        $('#edit_guardian_email').val(repo.email);
-        $('#edit_guardian_first_name').val(repo.first_name);
-        $('#edit_guardian_last_name').val(repo.last_name);
-        if (repo.gender == 'male') {
-            $('#edit-guardian-female').prop('checked', false);
-            $('#edit-guardian-male').prop('checked', true);
-        } else {
-            $('#edit-guardian-male').prop('checked', false);
-            $('#edit-guardian-female').prop('checked', true);
-        }
-        $('#edit_guardian_mobile').val(repo.mobile);
-        $('#edit_guardian_dob').val(repo.dob);
-        $('#edit-guardian-image-tag').attr('src', repo.image);
-    } else {
-        $('#edit_guardian_email').val(repo.text);
-        $('#edit_guardian_first_name').val('');
-        $('#edit_guardian_last_name').val('');
-        $('#edit_guardian_mobile').val('');
-    }
-    return repo.email || repo.text;
-});
 $(document).on('submit', '.setting-form', function (e) {
     e.preventDefault();
     let formData = new FormData(this);

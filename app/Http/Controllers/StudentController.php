@@ -224,22 +224,8 @@ class StudentController extends Controller {
             'image'           => 'nullable|mimes:jpeg,png,jpg,svg|image|max:2048',
             'dob'             => 'required',
             'session_year_id' => 'required|numeric',
-            'guardian_email'  => 'required|email|unique:users,email',
+            'guardian_email'  => 'required|email',
         ];
-
-        // Always look up the guardian's user ID from the DB using the submitted email.
-        // Relying on the form's guardian_id field is unreliable (Select2 with tags:true
-        // can submit the email string as the id, or an empty value, especially after
-        // changing class section). Using the email directly is the most robust approach.
-        $existingGuardian = \App\Models\User::withTrashed()->where('email', $request->guardian_email)->first();
-        if ($existingGuardian) {
-            // Exclude this guardian's row from the unique check so updating their
-            // own email (or keeping it the same) doesn't trigger a false unique error.
-            $rules['guardian_email'] = 'required|email|unique:users,email,' . $existingGuardian->id;
-        }
-
-        // If no existing user has this email, the default unique rule (no exclusion) applies,
-        // which is correct — the email is new and must not conflict with anyone else.
 
         $request->validate($rules);
 

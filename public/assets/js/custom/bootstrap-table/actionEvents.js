@@ -383,22 +383,12 @@ window.studentEvents = {
         }
 
         // Guardian Data
-        $(".edit-guardian-search").select2("trigger", "select", {
-            data: {
-                id: row.guardian_id || "",
-                text: row.guardian.email || "",
-                edit_data: true,
-            }
-        });
+        $('#edit_guardian_email').val(row.guardian.email || '');
+        $('#edit_guardian_first_name').val(row.guardian.first_name);
+        $('#edit_guardian_last_name').val(row.guardian.last_name);
+        $('#edit_guardian_mobile').val(row.guardian.mobile);
+        $('#edit-guardian-image-tag').attr('src', row.guardian.image);
 
-        //Adding delay to fill data so that select2 code and this code don't conflict each other
-        setTimeout(function () {
-            $('#edit_guardian_first_name').val(row.guardian.first_name);
-            $('#edit_guardian_last_name').val(row.guardian.last_name);
-            $('#edit_guardian_mobile').val(row.guardian.mobile);
-            $('#edit-guardian-image-tag').attr('src', row.guardian.image);
-
-        }, 500);
         if (row.guardian.gender == 'male') {
             $(document).find('#edit-guardian-female').prop('checked', false);
             $(document).find('#edit-guardian-male').prop('checked', true);
