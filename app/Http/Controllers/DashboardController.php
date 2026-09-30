@@ -75,14 +75,14 @@ class DashboardController extends Controller {
         if (Auth::user()->hasRole('School Admin') || Auth::user()->school_id) {
             // Counters
             $teacher = $this->user->builder()->role("Teacher")->count();
-            $student = $this->user->builder()->role("Student")->count();
-            $parent = $this->user->guardian()->whereHas('child.user', function ($q) {
+            $student = $this->user->builder()->role("Student")->where('status', 1)->count();
+            $parent = $this->user->guardian()->where('status', 1)->whereHas('child.user', function ($q) {
                 $q->owner();
             })->count();
-            
+
             if ($student > 0) {
-                $boys_count = $this->user->builder()->role('Student')->where('gender', 'male')->count();
-                $girls_count = $this->user->builder()->role('Student')->where('gender', 'female')->count();
+                $boys_count = $this->user->builder()->role('Student')->where('status', 1)->where('gender', 'male')->count();
+                $girls_count = $this->user->builder()->role('Student')->where('status', 1)->where('gender', 'female')->count();
                 $boys = round((($boys_count * 100) / $student), 2);
                 $girls = round(($girls_count * 100) / $student, 2);
                 $total_students = $student;
