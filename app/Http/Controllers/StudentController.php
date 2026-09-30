@@ -227,23 +227,19 @@ class StudentController extends Controller {
             'guardian_email'  => 'required|email|unique:users,email',
         ];
 
-        // Determine the guardian's user ID to exclude from the unique check.
-        // guardian_id from the form may be empty/non-numeric when select2 loses
-        // its value (e.g. after changing class section), so fall back to the DB.
-        $guardianUserId = null;
-        if (is_numeric($request->guardian_id)) {
-            $guardianUserId = $request->guardian_id;
-        } else {
-            // Look up the current student's guardian from the DB
-            $currentStudent = \App\Models\Students::withTrashed()->where('user_id', $id)->first();
-            if ($currentStudent && is_numeric($currentStudent->guardian_id)) {
-                $guardianUserId = $currentStudent->guardian_id;
-            }
+        // Always look up the guardian's user ID from the DB using the submitted email.
+        // Relying on the form's guardian_id field is unreliable (Select2 with tags:true
+        // can submit the email string as the id, or an empty value, especially after
+        // changing class section). Using the email directly is the most robust approach.
+        $existingGuardian = \App\Models\User::withTrashed()->where('email', $request->guardian_email)->first();
+        if ($existingGuardian) {
+            // Exclude this guardian's row from the unique check so updating their
+            // own email (or keeping it the same) doesn't trigger a false unique error.
+            $rules['guardian_email'] = 'required|email|unique:users,email,' . $existingGuardian->id;
         }
 
-        if ($guardianUserId) {
-            $rules['guardian_email'] = 'required|email|unique:users,email,' . $guardianUserId;
-        }
+        // If no existing user has this email, the default unique rule (no exclusion) applies,
+        // which is correct — the email is new and must not conflict with anyone else.
 
         $request->validate($rules);
 
