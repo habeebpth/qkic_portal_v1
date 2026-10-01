@@ -156,7 +156,7 @@
                     <div class="card-body custom-card-body">
                         <div class="d-flex flex-row flex-wrap">
                             <div class="ms-3">
-                                {{ __('Father Info') }}
+                                {{ __('Total Fathers') }}
                                 <p class="text-muted">
                                 <h3>{{ $father_count }}</h3>
                                 </p>
@@ -173,7 +173,7 @@
                     <div class="card-body custom-card-body">
                         <div class="d-flex flex-row flex-wrap">
                             <div class="ms-3">
-                                {{ __('Mother Info') }}
+                                {{ __('Total Mothers') }}
                                 <p class="text-muted">
                                 <h3>{{ $mother_count }}</h3>
                                 </p>
