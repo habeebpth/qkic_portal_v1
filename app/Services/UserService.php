@@ -56,7 +56,7 @@ class UserService {
 
         $parent = array(
             'first_name' => $first_name,
-            'last_name'  => $last_name,
+            'last_name'  => $last_name ?? '',
             'mobile'     => $mobile,
             'gender'     => $gender,
             'school_id'  => null
