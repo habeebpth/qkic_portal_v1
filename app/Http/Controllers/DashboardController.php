@@ -65,6 +65,7 @@ class DashboardController extends Controller {
 
     public function index() {
         $teacher = $student = $parent = $teachers = $subscription = $prepiad_upcoming_plan = $prepiad_upcoming_plan_type = $check_payment = null;
+        $father_count = $mother_count = 0;
         $boys = $girls = $license_expire = 0;
         $previous_subscriptions = array();
         $announcement = array();
@@ -84,6 +85,17 @@ class DashboardController extends Controller {
                     $q2->owner();
                 });
             })->count();
+
+            $father_count = \App\Models\Students::where('session_year_id', $defaultSessionYear->id)
+                ->whereNotNull('father_name')->where('father_name', '!=', '')
+                ->whereHas('user', function ($q) {
+                    $q->owner()->where('status', 1);
+                })->count();
+            $mother_count = \App\Models\Students::where('session_year_id', $defaultSessionYear->id)
+                ->whereNotNull('mother_name')->where('mother_name', '!=', '')
+                ->whereHas('user', function ($q) {
+                    $q->owner()->where('status', 1);
+                })->count();
 
             if ($student > 0) {
                 $boys_count = $this->user->builder()->role('Student')->where('status', 1)->where('gender', 'male')->whereHas('student', function ($q) use ($defaultSessionYear) {
@@ -249,7 +261,7 @@ class DashboardController extends Controller {
         }
         
         if ((Auth::user()->hasRole('School Admin') || Auth::user()->school_id) && (!Auth::user()->hasRole('Teacher') && !Auth::user()->hasRole('Super Admin')) ) {
-            return view('dashboard', compact('teacher', 'parent', 'student', 'announcement', 'teachers', 'boys', 'girls', 'total_students','license_expire', 'subscription', 'previous_subscriptions', 'holiday', 'classData', 'prepiad_upcoming_plan', 'prepiad_upcoming_plan_type','check_payment','sessionYear','classes_counter','streams','exams', 'fees_detail', 'settings', 'class_names'));
+            return view('dashboard', compact('teacher', 'parent', 'student', 'father_count', 'mother_count', 'announcement', 'teachers', 'boys', 'girls', 'total_students','license_expire', 'subscription', 'previous_subscriptions', 'holiday', 'classData', 'prepiad_upcoming_plan', 'prepiad_upcoming_plan_type','check_payment','sessionYear','classes_counter','streams','exams', 'fees_detail', 'settings', 'class_names'));
         }
         if (Auth::user()->hasRole('Teacher')) {
             return view('teacher_dashboard', compact('teacher', 'parent', 'student', 'announcement', 'teachers', 'boys', 'girls', 'holiday', 'timetables', 'classData','sessionYear','classes_counter','streams','class_names','total_students','exams'));

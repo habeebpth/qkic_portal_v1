@@ -150,6 +150,40 @@
                     </div>
                 </div>
             </div>
+            {{-- Father Info --}}
+            <div class="col-md-2-4 stretch-card grid-margin">
+                <div class="card">
+                    <div class="card-body custom-card-body">
+                        <div class="d-flex flex-row flex-wrap">
+                            <div class="ms-3">
+                                {{ __('Father Info') }}
+                                <p class="text-muted">
+                                <h3>{{ $father_count }}</h3>
+                                </p>
+                                <p class="mt-2 text-success font-weight-bold"> </p>
+                            </div>
+                            <img class="ml-auto" src="{{ url('images/guardians.svg') }}" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- Mother Info --}}
+            <div class="col-md-2-4 stretch-card grid-margin">
+                <div class="card">
+                    <div class="card-body custom-card-body">
+                        <div class="d-flex flex-row flex-wrap">
+                            <div class="ms-3">
+                                {{ __('Mother Info') }}
+                                <p class="text-muted">
+                                <h3>{{ $mother_count }}</h3>
+                                </p>
+                                <p class="mt-2 text-success font-weight-bold"> </p>
+                            </div>
+                            <img class="ml-auto" src="{{ url('images/guardians.svg') }}" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     @endif
     {{-- End Counter --}}
