@@ -13,6 +13,7 @@ use App\Repositories\Attendance\AttendanceInterface;
 use App\Repositories\Exam\ExamInterface;
 use App\Repositories\ExamResult\ExamResultInterface;
 use App\Repositories\Files\FilesInterface;
+use App\Repositories\Grades\GradesInterface;
 use App\Repositories\Holiday\HolidayInterface;
 use App\Repositories\Lessons\LessonsInterface;
 use App\Repositories\OnlineExam\OnlineExamInterface;
@@ -36,6 +37,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use JetBrains\PhpStorm\NoReturn;
+use PDF;
 use Throwable;
 
 class StudentApiController extends Controller {
@@ -62,8 +64,9 @@ class StudentApiController extends Controller {
     private OnlineExamStudentAnswerInterface $onlineExamStudentAnswer;
     private SlidersInterface $sliders;
     private FeaturesService $featureService;
+    private GradesInterface $grade;
 
-    public function __construct(StudentInterface $student, UserInterface $user, AssignmentInterface $assignment, AssignmentSubmissionInterface $assignmentSubmission, FilesInterface $files, CachingService $cache, StudentSubjectInterface $studentSubject, TimetableInterface $timetable, ExamInterface $exam, ExamResultInterface $examResult, LessonsInterface $lesson, TopicsInterface $lessonTopic, AttendanceInterface $attendance, HolidayInterface $holiday, SessionYearInterface $sessionYear, SubjectTeacherInterface $subjectTeacher, AnnouncementInterface $announcement, OnlineExamInterface $onlineExam, StudentOnlineExamStatusInterface $studentOnlineExamStatus, OnlineExamQuestionChoiceInterface $onlineExamQuestionChoice, OnlineExamStudentAnswerInterface $onlineExamStudentAnswer, SlidersInterface $sliders, FeaturesService $featuresService) {
+    public function __construct(StudentInterface $student, UserInterface $user, AssignmentInterface $assignment, AssignmentSubmissionInterface $assignmentSubmission, FilesInterface $files, CachingService $cache, StudentSubjectInterface $studentSubject, TimetableInterface $timetable, ExamInterface $exam, ExamResultInterface $examResult, LessonsInterface $lesson, TopicsInterface $lessonTopic, AttendanceInterface $attendance, HolidayInterface $holiday, SessionYearInterface $sessionYear, SubjectTeacherInterface $subjectTeacher, AnnouncementInterface $announcement, OnlineExamInterface $onlineExam, StudentOnlineExamStatusInterface $studentOnlineExamStatus, OnlineExamQuestionChoiceInterface $onlineExamQuestionChoice, OnlineExamStudentAnswerInterface $onlineExamStudentAnswer, SlidersInterface $sliders, FeaturesService $featuresService, GradesInterface $grade) {
         $this->student = $student;
         $this->user = $user;
         $this->assignment = $assignment;
@@ -87,6 +90,7 @@ class StudentApiController extends Controller {
         $this->onlineExamStudentAnswer = $onlineExamStudentAnswer;
         $this->sliders = $sliders;
         $this->featureService = $featuresService;
+        $this->grade = $grade;
     }
 
 
@@ -619,9 +623,21 @@ class StudentApiController extends Controller {
         }
     }
 
-    public function getExamMarks() {
+    public function getAllSessionYears() {
+        try {
+            $sessionYears = $this->sessionYear->builder()->orderByDesc('start_date')->get(['id', 'name', 'default']);
+            ResponseService::successResponse('Session Years Fetched Successfully', $sessionYears);
+        } catch (Throwable $e) {
+            ResponseService::logErrorResponse($e, 'StudentApiController :- getAllSessionYears Method');
+            ResponseService::errorResponse();
+        }
+    }
+
+    public function getExamMarks(Request $request) {
         try {
             $studentData = Auth::user()->student->load('class_section.class:id,name', 'class_section.section:id,name', 'class_section.medium:id,name');
+
+            $sessionYearId = $request->session_year_id ?: $this->cache->getDefaultSessionYear()->id;
 
             // Exam Result Data
             $examResultDB = $this->examResult->builder()->with([
@@ -633,7 +649,7 @@ class StudentApiController extends Controller {
                 'exam.marks' => function ($q) use ($studentData) {
                     $q->where('student_id', $studentData->user_id);
                 }
-            ])->where('student_id', $studentData->user_id)->get();
+            ])->where('student_id', $studentData->user_id)->where('session_year_id', $sessionYearId)->get();
 
 
             // Check that Exam Result DB is not empty
@@ -645,11 +661,14 @@ class StudentApiController extends Controller {
                         'exam_name'      => $examResultData->exam->name,
                         'class_name'     => $studentData->class_section->full_name,
                         'student_name'   => $examResultData->user->full_name,
+                        'admission_no'   => $studentData->admission_no,
+                        'roll_number'    => $studentData->roll_number,
                         'exam_date'      => $examResultData->exam->start_date,
                         'total_marks'    => $examResultData->total_marks,
                         'obtained_marks' => $examResultData->obtained_marks,
                         'percentage'     => $examResultData->percentage,
                         'grade'          => $examResultData->grade,
+                        'status'         => $examResultData->status,
                         'session_year'   => $examResultData->session_year->name,
                     );
                     $exam_marks = array();
@@ -680,6 +699,49 @@ class StudentApiController extends Controller {
         }
     }
 
+    public function examResultPdf($examId) {
+        try {
+            $result = $this->examResult->builder()
+                ->with(['exam', 'session_year', 'user' => function ($q) use ($examId) {
+                    $q->with(['student' => function ($q) {
+                        $q->with('guardian', 'class_section.class.stream', 'class_section.section', 'class_section.medium');
+                    }])
+                    ->with(['exam_marks' => function ($q) use ($examId) {
+                        $q->whereHas('timetable', function ($q) use ($examId) {
+                            $q->where('exam_id', $examId);
+                        })->with(['class_subject' => function ($q) {
+                            $q->withTrashed()->with('subject:id,name,type');
+                        }])
+                        ->with('timetable');
+                    }]);
+                }])
+                ->where('exam_id', $examId)
+                ->where('student_id', Auth::id())
+                ->whereHas('exam', function ($q) {
+                    $q->where('publish', 1);
+                })
+                ->select('exam_results.*', DB::raw('(SELECT COUNT(DISTINCT er2.obtained_marks) FROM exam_results er2 WHERE er2.class_section_id = exam_results.class_section_id AND er2.obtained_marks > exam_results.obtained_marks AND er2.exam_id = exam_results.exam_id) + 1 as `rank`'))
+                ->first();
+
+            if (!$result) {
+                ResponseService::errorResponse('Transcript not found.', null, 404);
+            }
+
+            $grades = $this->grade->builder()->orderBy('starting_range', 'ASC')->get();
+
+            $settings = $this->cache->getSchoolSettings();
+            $data = explode('storage/', $settings['horizontal_logo'] ?? '');
+            $settings['horizontal_logo'] = end($data);
+
+            $pdf = PDF::loadView('exams.exam_result_pdf', compact('result', 'settings', 'grades'));
+
+            return $pdf->download('transcript-' . $result->exam->name . '.pdf');
+        } catch (Throwable $e) {
+            ResponseService::logErrorResponse($e, 'StudentApiController :- examResultPdf Method');
+            ResponseService::errorResponse();
+        }
+    }
+
     public function getProfileDetails() {
         try {
             $studentData = Auth::user()->load(['student' => function ($query) {
@@ -693,6 +755,7 @@ class StudentApiController extends Controller {
                 'first_name'        => $studentData->first_name,
                 'last_name'         => $studentData->last_name,
                 'mobile'            => $studentData->mobile,
+                'email'             => $studentData->email,
                 'roll_number'       => $studentData->student->roll_number,
                 'admission_no'      => $studentData->student->admission_no,
                 'admission_date'    => $studentData->student->admission_date,

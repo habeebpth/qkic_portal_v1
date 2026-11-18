@@ -50,6 +50,8 @@ Route::group(['prefix' => 'student'], static function () {
         Route::get('get-exam-list', [StudentApiController::class, 'getExamList']); // Exam list Route
         Route::get('get-exam-details', [StudentApiController::class, 'getExamDetails']); // Exam Details Route
         Route::get('exam-marks', [StudentApiController::class, 'getExamMarks']); // Exam Details Route
+        Route::get('exam-result-pdf/{examId}', [StudentApiController::class, 'examResultPdf']); // Exam Transcript PDF Route
+        Route::get('all-session-years', [StudentApiController::class, 'getAllSessionYears']); // All Session Years Route
         Route::get('sliders', [StudentApiController::class, 'getSliders']); // Sliders
 
         // online exam routes

@@ -82,6 +82,12 @@ use Illuminate\Support\Facades\Session;
 */
 Auth::routes();
 Route::get('/', [AuthController::class, 'login']);
+
+/*** Student Portal — React SPA (built assets in public/student-portal-assets), talks to the /api/student/* Sanctum API ***/
+Route::get('/student-portal/{any?}', function () {
+    return response(file_get_contents(public_path('student-portal-assets/index.html')), 200)
+        ->header('Content-Type', 'text/html');
+})->where('any', '.*');
 // Route::get('/', [Controller::class, 'index']);
 // Route::get('/', function($q){
 //     return redirect('dashboard');

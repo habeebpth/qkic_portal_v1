@@ -1,5 +1,6 @@
 /vendor/
 /node_modules/
+/student-portal-frontend/node_modules/
 /.env
 .env.*
 /storage/logs/
